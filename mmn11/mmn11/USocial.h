@@ -1,6 +1,9 @@
 #pragma once
 #include <map>
 #include "User.h"
+#include "Photo.h"
+#include "Audio.h"
+#include "Video.h"
 
 using namespace std;
 

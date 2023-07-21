@@ -18,60 +18,57 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\USocial.cpp">
+    <ClCompile Include="USocial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Post.cpp">
+    <ClCompile Include="User.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\User.cpp">
+    <ClCompile Include="Post.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Message.cpp">
+    <ClCompile Include="Message.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\BusinessUser.cpp">
+    <ClCompile Include="BusinessUser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Audio.cpp">
+    <ClCompile Include="Audio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Photo.cpp">
+    <ClCompile Include="Photo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Video.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Media.cpp">
+    <ClCompile Include="Video.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\BusinessUser.h">
+    <ClInclude Include="User.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Audio.h">
+    <ClInclude Include="USocial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Post.h">
+    <ClInclude Include="BusinessUser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\USocial.h">
+    <ClInclude Include="Audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Message.h">
+    <ClInclude Include="Post.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\User.h">
+    <ClInclude Include="Message.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Photo.h">
+    <ClInclude Include="Photo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Media.h">
+    <ClInclude Include="Media.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Video.h">
+    <ClInclude Include="Video.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

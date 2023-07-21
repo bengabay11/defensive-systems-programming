@@ -3,7 +3,6 @@
 #include <list>
 #include "Post.h"
 #include "Message.h"
-#include "User.h"
 
 using namespace std;
 

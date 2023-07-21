@@ -1,22 +1,35 @@
-// mmn11.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
+﻿#include "USocial.h"
+#include "User.h"
+#include <exception>
 #include <iostream>
-#include "src/Message.h"
 
 int main()
 {
-    Message message = Message::Message("test");
-    cout << message.getText();
+	USocial us;
+	User* u1 = us.registerUser("Liron");
+	User* u2 = us.registerUser("Yahav");
+	User* u3 = us.registerUser("Shachaf");
+	User* u4 = us.registerUser("Tsur", true);
+	User* u5 = us.registerUser("Elit");
+	u1->post("Hello world!");
+	u2->post("I'm having a great time here :)", new Audio());
+	u3->post("This is awesome!", new Photo());
+	u5->addFriend(u1);
+	u5->addFriend(u2);
+	u5->viewFriendsPosts(); // should see only u1, u2 s' posts
+	u4->sendMessage(u5, new Message("Buy Falafel!"));
+	u5->viewReceivedMessages();
+	try
+	{
+		u3->sendMessage(u5, new Message("All your base are belong to us"));
+	}
+	catch (const std::exception& e)
+	{
+		std::cout << "error: " << e.what() << std::endl;
+	}
+	u5->viewReceivedMessages();
+	u3->addFriend(u5);
+	u3->sendMessage(u5, new Message("All your base are belong to us"));
+	u5->viewReceivedMessages();
+	return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

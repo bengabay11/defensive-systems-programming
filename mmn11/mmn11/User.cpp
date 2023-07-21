@@ -34,6 +34,14 @@ void User::viewReceivedMessages()
 	}
 }
 
+User::User()
+{
+}
+
+User::~User()
+{
+}
+
 unsigned long User::getId()
 {
 	return this->id;
