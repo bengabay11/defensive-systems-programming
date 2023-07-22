@@ -18,7 +18,7 @@ User* USocial::registerUser(std::string username, bool is_business)
 	else {
 		new_user = new User();
 	}
-	new_user->id = id_counter++;
+	new_user->id = this->idCounter++;
 	new_user->name = username;
 	new_user->us = this;
 	this->users.insert(std::make_pair(new_user->getId(), new_user));

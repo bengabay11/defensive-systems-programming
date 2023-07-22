@@ -9,7 +9,7 @@
 class USocial
 {
 private:
-	unsigned long id_counter;
+	unsigned long idCounter;
 	std::map<unsigned long, User*> users;
 public:
 	User* registerUser(std::string, bool = false);
