@@ -141,8 +141,10 @@
   <ItemGroup>
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="BusinessUser.cpp" />
+    <ClCompile Include="FriendAlreadyExistsException.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Message.cpp" />
+    <ClCompile Include="NotAFriendException.cpp" />
     <ClCompile Include="Photo.cpp" />
     <ClCompile Include="Post.cpp" />
     <ClCompile Include="User.cpp" />
@@ -152,8 +154,10 @@
   <ItemGroup>
     <ClInclude Include="Audio.h" />
     <ClInclude Include="BusinessUser.h" />
+    <ClInclude Include="FriendAlreadyExistsException.h" />
     <ClInclude Include="Media.h" />
     <ClInclude Include="Message.h" />
+    <ClInclude Include="NotAFriendException.h" />
     <ClInclude Include="Photo.h" />
     <ClInclude Include="Post.h" />
     <ClInclude Include="User.h" />

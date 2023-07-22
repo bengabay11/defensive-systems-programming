@@ -1,7 +1,7 @@
 #include "FriendAlreadyExistsException.h"
 
 FriendAlreadyExistsException::FriendAlreadyExistsException(std::string username, std::string friendName): 
-	std::runtime_error(username + " is already a friend of " + friendName), username(username), friendName(friend_name) {}
+	std::runtime_error(username + " is already a friend of " + friendName), username(username), friendName(friendName) {}
 
 std::string FriendAlreadyExistsException::getUserName()
 {

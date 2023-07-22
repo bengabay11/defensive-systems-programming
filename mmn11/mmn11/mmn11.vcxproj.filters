@@ -42,6 +42,12 @@
     <ClCompile Include="Video.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FriendAlreadyExistsException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NotAFriendException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="User.h">
@@ -69,6 +75,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Video.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FriendAlreadyExistsException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NotAFriendException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
