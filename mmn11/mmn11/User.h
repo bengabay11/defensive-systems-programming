@@ -1,10 +1,9 @@
 #pragma once
+
 #include <string>
 #include <list>
 #include "Post.h"
 #include "Message.h"
-
-using namespace std;
 
 class USocial;
 
@@ -13,20 +12,20 @@ protected:
 	USocial* us;
 	friend class USocial;
 	unsigned long id;
-	string name;
-	list<unsigned long> friends;
-	list<Post* > posts;
-	list<Message*> receivedMsgs;
+	std::string name;
+	std::list<unsigned long> friends;
+	std::list<Post* > posts;
+	std::list<Message*> receivedMsgs;
 	User();
 	~User();
 public:
 	unsigned long getId();
-	string getName();
+	std::string getName();
 	void addFriend(User* user);
 	void removeFriend(User*);
-	void post(string);
-	void post(string, Media*);
-	list<Post*> getPosts();
+	void post(std::string);
+	void post(std::string, Media*);
+	std::list<Post*> getPosts();
 	void viewFriendsPosts();
 	void receiveMessage(Message*);
 	virtual void sendMessage(User*, Message*);

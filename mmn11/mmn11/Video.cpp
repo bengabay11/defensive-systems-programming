@@ -1,9 +1,7 @@
 #include "Video.h"
 #include <iostream>
 
-using namespace std;
-
 void Video::display()
 {
-	cout << "video" << endl;
+	std::cout << "video" << std::endl;
 }

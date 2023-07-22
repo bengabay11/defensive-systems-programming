@@ -1,14 +1,13 @@
 #pragma once
-#include <string>
 
-using namespace std;
+#include <string>
 
 class Message {
 private:
-	string text;
+	std::string text;
 public:
-	Message(string text);
-	string getText() const;
+	Message(std::string text);
+	std::string getText() const;
 };
 
-ostream& operator << (ostream& out, const Message& message);
+std::ostream& operator << (std::ostream& out, const Message& message);

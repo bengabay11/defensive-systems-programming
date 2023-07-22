@@ -1,6 +1,8 @@
 #include "User.h"
 #include <iostream>
 #include "USocial.h"
+#include "FriendAlreadyExistsException.h"
+#include "NotAFriendException.h"
 
 User::User() {}
 
@@ -20,12 +22,12 @@ unsigned long User::getId()
 	return this->id;
 }
 
-string User::getName()
+std::string User::getName()
 {
 	return this->name;
 }
 
-list<Post*> User::getPosts()
+std::list<Post*> User::getPosts()
 {
 	return this->posts;
 }
@@ -37,9 +39,9 @@ void User::viewFriendsPosts()
 {
 	for (unsigned long friend_id : this->friends) {
 		User* user = this->us->getUserById(friend_id);
-		cout << user->getName() << "'s posts:" << endl;
+		std::cout << user->getName() << "'s posts:" << std::endl;
 		for (Post* post : user->posts) {
-			cout << *post << endl;
+			std::cout << *post << std::endl;
 		}
 	}
 }
@@ -58,7 +60,7 @@ void User::receiveMessage(Message* message)
 /**
  * @brief Send a message to other user.
  * 
- * if the given user is not in the friends list, runtime_error will be thrown.
+ * if the given user is not in the friends list, NotAFriendException will be thrown.
  * @param user The user that receives the message.
  * @param message The message to be sent.
  */
@@ -69,7 +71,7 @@ void User::sendMessage(User* user, Message* message)
 		user->receiveMessage(message);
 	}
 	else {
-		throw runtime_error("Failed sending a message: "  + user->getName() + " is not a friend of  " + this->getName() + ", so the message cannot be sent");
+		throw NotAFriendException(this->getName(), user->getName());
 	}
 }
 
@@ -79,19 +81,21 @@ void User::sendMessage(User* user, Message* message)
 void User::viewReceivedMessages()
 {
 	for (Message* message : this->receivedMsgs) {
-		cout << *message << endl;
+		std::cout << *message << std::endl;
 	}
 }
 
 /**
  * @brief Add friend to the list of friends.
+ * 
+ * if the given user is in the friends list, FriendAlreadyExistsException will be thrown.
  * @param user The friend user to add.
  */
 void User::addFriend(User* user)
 {
 	auto it = std::find(this->friends.begin(), this->friends.end(), user->getId());
 	if (it != this->friends.end()) {
-		throw runtime_error("Add friend failed: " + user->getName() + " is already a friend of " + this->getName());
+		throw FriendAlreadyExistsException(this->getName(), user->getName());
 	}
 	else {
 		this->friends.push_back(user->getId());
@@ -100,6 +104,8 @@ void User::addFriend(User* user)
 
 /**
  * @brief Remove friend from the list of friends.
+ * 
+ * if the given user is not in the friends list, NotAFriendException will be thrown.
  * @param user The friend user to remove.
  */
 void User::removeFriend(User* user)
@@ -109,7 +115,7 @@ void User::removeFriend(User* user)
 		this->friends.remove(user->getId());
 	}
 	else {
-		throw runtime_error("Remove friend failed: " + user->getName() + " is not a friend of " + this->getName());
+		throw NotAFriendException(this->getName(), user->getName());
 	}
 	this->friends.remove(user->getId());
 }
@@ -118,7 +124,7 @@ void User::removeFriend(User* user)
  * @brief Add post for the user.
  * @param text The text of the post.
  */
-void User::post(string text)
+void User::post(std::string text)
 {
 	Post* new_post = new Post(text);
 	this->posts.push_back(new_post);
@@ -129,7 +135,7 @@ void User::post(string text)
  * @param text The text of the post.
  * @param media The media of the post.
  */
-void User::post(string text, Media* media)
+void User::post(std::string text, Media* media)
 {
 	Post* new_post = new Post(text, media);
 	this->posts.push_back(new_post);

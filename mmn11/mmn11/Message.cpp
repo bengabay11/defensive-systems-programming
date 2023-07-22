@@ -1,20 +1,18 @@
 #include "Message.h"
 #include <iostream>
 
-using namespace std;
-
-Message::Message(string text)
+Message::Message(std::string text)
 {
     this->text = text;
 }
 
-string Message::getText() const
+std::string Message::getText() const
 {
     return this->text;
 }
 
-ostream& operator<<(ostream& out, const Message& message)
+std::ostream& operator<<(std::ostream& out, const Message& message)
 {
-    cout << message.getText() << endl;
+    std::cout << message.getText() << std::endl;
     return out;
 }

@@ -1,19 +1,18 @@
 #pragma once
+
 #include <string>
 #include "Media.h"
 
-using namespace std;
-
 class Post {
 private:
-	string text;
+	std::string text;
 	Media* media;
 public:
-	Post(string text);
-	Post(string text, Media* media);
+	Post(std::string text);
+	Post(std::string text, Media* media);
 	~Post();
-	string getText() const;
+	std::string getText() const;
 	Media* getMedia() const;
 };
 
-ostream& operator<< (ostream& out, const Post& post);
+std::ostream& operator<< (std::ostream& out, const Post& post);
