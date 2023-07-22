@@ -5,6 +5,6 @@ class BusinessUser :
     public User
 {
 public:
-    BusinessUser(unsigned long, USocial*, string);
+    BusinessUser();
     void sendMessage(User*, Message*) override;
 };

@@ -17,7 +17,7 @@ protected:
 	list<unsigned long> friends;
 	list<Post* > posts;
 	list<Message*> receivedMsgs;
-	User(unsigned long, USocial*, string);
+	User();
 	~User();
 public:
 	unsigned long getId();
