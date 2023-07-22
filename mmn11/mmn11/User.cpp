@@ -11,8 +11,9 @@ void User::viewFriendsPosts()
 {
 	for (unsigned long friend_id : this->friends) {
 		User* user = this->us->getUserById(friend_id);
+		cout << user->getName() << "'s posts:" << endl;
 		for (Post* post : user->posts) {
-			cout << post << endl;
+			cout << *post << endl;
 		}
 	}
 }
@@ -24,22 +25,33 @@ void User::receiveMessage(Message* message)
 
 void User::sendMessage(User* user, Message* message)
 {
-	user->receiveMessage(message);
+	auto it = find(this->friends.begin(), this->friends.end(), user->getId());
+	if (it != this->friends.end()) {
+		user->receiveMessage(message);
+	}
+	else {
+		throw runtime_error(user->getName() + " is not a friend of " + this->getName() + ", so the message cannot be sent");
+	}
 }
 
 void User::viewReceivedMessages()
 {
 	for (Message* message : this->receivedMsgs) {
-		cout << message << endl;
+		cout << *message << endl;
 	}
 }
 
-User::User()
-{
-}
+User::User(unsigned long id, USocial* us, string name): id(id), us(us), name(name) {}
 
 User::~User()
 {
+	delete this->us;
+	for (auto post : this->posts) {
+		delete post;
+	}
+	for (auto message : this->receivedMsgs) {
+		delete message;
+	}
 }
 
 unsigned long User::getId()

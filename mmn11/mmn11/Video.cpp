@@ -5,5 +5,5 @@ using namespace std;
 
 void Video::display()
 {
-	cout << "Video";
+	cout << "video" << endl;
 }

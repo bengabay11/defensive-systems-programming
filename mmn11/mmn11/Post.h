@@ -11,8 +11,9 @@ private:
 public:
 	Post(string text);
 	Post(string text, Media* media);
-	string getText();
-	Media* getMedia();
+	~Post();
+	string getText() const;
+	Media* getMedia() const;
 };
 
 ostream& operator<< (ostream& out, const Post& post);

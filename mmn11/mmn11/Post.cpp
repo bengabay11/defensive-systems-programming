@@ -5,21 +5,27 @@ Post::Post(string text): text(text), media(nullptr) {}
 
 Post::Post(string text, Media* media): text(text), media(media) {}
 
-string Post::getText()
+Post::~Post()
+{
+    delete this->media;
+}
+
+string Post::getText() const
 {
     return this->text;
 }
 
-Media* Post::getMedia()
+Media* Post::getMedia() const
 {
     return this->media;
 }
 
-ostream& operator<<(ostream& out, Post& post)
+ostream& operator<<(ostream& out, const Post& post)
 {
-    out << post.getText() << endl;
+    out << "Text: " << post.getText() << endl;
     Media* media = post.getMedia();
     if (media != nullptr) {
+        out << "Media: ";
         media->display();
     }
     return out;

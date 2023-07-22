@@ -8,7 +8,7 @@ private:
 	string text;
 public:
 	Message(string text);
-	string getText();
+	string getText() const;
 };
 
-ostream& operator << (ostream& out, Message& message);
+ostream& operator << (ostream& out, const Message& message);

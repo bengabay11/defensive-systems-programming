@@ -1,12 +1,16 @@
 #include "USocial.h"
+#include "BusinessUser.h"
 
-User* USocial::registerUser(string username, bool)
+User* USocial::registerUser(string username, bool is_business)
 {
-	User* new_user = new User();
-	unsigned long user_id = 1;
-	new_user->id = user_id;
-	new_user->us = this;
-	this->users.insert(make_pair(user_id, new_user));
+	User* new_user;
+	if (is_business) {
+		new_user = new BusinessUser(id_counter++, this, username);
+	}
+	else {
+		new_user = new User(id_counter++, this, username);
+	}
+	this->users.insert(make_pair(new_user->getId(), new_user));
 	return new_user;
 }
 

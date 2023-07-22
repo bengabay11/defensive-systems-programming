@@ -10,9 +10,10 @@ using namespace std;
 class USocial
 {
 private:
+	unsigned long id_counter;
 	map<unsigned long, User*> users;
 public:
-	User* registerUser(string, bool);
+	User* registerUser(string, bool = false);
 	void removeUser(User*);
 	User* getUserById(unsigned long);
 };

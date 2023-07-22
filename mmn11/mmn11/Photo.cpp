@@ -5,5 +5,5 @@ using namespace std;
 
 void Photo::display()
 {
-	cout << "Photo";
+	cout << "image" << endl;
 }

@@ -17,7 +17,7 @@ protected:
 	list<unsigned long> friends;
 	list<Post* > posts;
 	list<Message*> receivedMsgs;
-	User();
+	User(unsigned long, USocial*, string);
 	~User();
 public:
 	unsigned long getId();
@@ -29,6 +29,6 @@ public:
 	list<Post*> getPosts();
 	void viewFriendsPosts();
 	void receiveMessage(Message*);
-	void sendMessage(User*, Message*);
+	virtual void sendMessage(User*, Message*);
 	void viewReceivedMessages();
 };

@@ -5,5 +5,5 @@ using namespace std;
 
 void Audio::display()
 {
-	cout << "Audio";
+	cout << "audio" << endl;
 }
