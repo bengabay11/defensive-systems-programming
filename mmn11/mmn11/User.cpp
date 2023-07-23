@@ -160,7 +160,6 @@ void User::removeFriend(User* user)
 	else {
 		throw NotAFriendException(this->getName(), user->getName());
 	}
-	this->friends.remove(user->getId());
 }
 
 /**

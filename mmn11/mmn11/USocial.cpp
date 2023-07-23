@@ -31,6 +31,7 @@ USocial& USocial::operator=(const USocial& other)
 	for (const auto& pair : other.users) {
 		this->users[pair.first] = new User(*pair.second);
 	}
+
 	this->idCounter = other.idCounter;
 
 	return *this;
