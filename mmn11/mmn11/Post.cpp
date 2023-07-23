@@ -12,7 +12,6 @@ Post::~Post()
 
 Post::Post(const Post& other): text(other.text), media(nullptr)
 {
-    this->text = other.text;
     if (other.media) {
         this->media = other.media->clone();
     }

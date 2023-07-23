@@ -4,7 +4,7 @@
 #include "FriendAlreadyExistsException.h"
 #include "NotAFriendException.h"
 
-User::User() : us(nullptr), id(0), name("") {}
+User::User(USocial* us, unsigned long id, std::string name) : us(us), id(id), name(name) {}
 
 User::~User()
 {
@@ -16,11 +16,10 @@ User::~User()
 	}
 }
 
-User::User(const User& other): id(other.id), name(other.name), posts(), receivedMsgs()
+User::User(const User& other): us(other.us), id(other.id), name(other.name), friends(), posts(), receivedMsgs()
 {
-	this->us = other.us;
 	for (unsigned long friendId : other.friends) {
-		friends.push_back(friendId);
+		this->friends.push_back(friendId);
 	}
 	for (auto post : other.posts) {
 		this->posts.push_back(new Post(*post));
@@ -47,7 +46,7 @@ User& User::operator=(const User& other)
 	this->posts.clear();
 	this->receivedMsgs.clear();
 	for (unsigned long friendId : other.friends) {
-		friends.push_back(friendId);
+		this->friends.push_back(friendId);
 	}
 	for (auto post : other.posts) {
 		this->posts.push_back(new Post(*post));
@@ -81,8 +80,8 @@ std::list<Post*> User::getPosts()
  */
 void User::viewFriendsPosts()
 {
-	for (unsigned long friend_id : this->friends) {
-		User* user = this->us->getUserById(friend_id);
+	for (unsigned long friendId : this->friends) {
+		User* user = this->us->getUserById(friendId);
 		std::cout << user->getName() << "'s posts:" << std::endl;
 		for (Post* post : user->posts) {
 			std::cout << *post << std::endl;
@@ -170,8 +169,8 @@ void User::removeFriend(User* user)
  */
 void User::post(std::string text)
 {
-	Post* new_post = new Post(text);
-	this->posts.push_back(new_post);
+	Post* newPost = new Post(text);
+	this->posts.push_back(newPost);
 }
 
 /**

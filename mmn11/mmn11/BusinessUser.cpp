@@ -1,6 +1,6 @@
 #include "BusinessUser.h"
 
-BusinessUser::BusinessUser() {}
+BusinessUser::BusinessUser(USocial* us, unsigned long id, std::string name): User(us, id, name) {}
 
 /**
  * @brief Send a message to other user.

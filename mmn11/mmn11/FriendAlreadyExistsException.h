@@ -10,7 +10,7 @@ private:
     std::string username;
     std::string friendName;
 public:
-    FriendAlreadyExistsException(const std::string, const std::string);
+    FriendAlreadyExistsException(std::string username, std::string friendName);
     std::string getUserName();
     std::string getFriendName();
 };

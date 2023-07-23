@@ -6,6 +6,6 @@ class BusinessUser :
     public User
 {
 public:
-    BusinessUser();
-    void sendMessage(User*, Message*) override;
+    BusinessUser(USocial* us, unsigned long id, std::string name);
+    void sendMessage(User* user, Message* message) override;
 };

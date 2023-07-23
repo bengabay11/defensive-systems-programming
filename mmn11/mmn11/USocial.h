@@ -14,9 +14,9 @@ private:
 public:
 	USocial();
 	~USocial();
-	USocial(const USocial&);
-	USocial& operator=(const USocial&);
-	User* registerUser(std::string, bool = false);
-	void removeUser(User*);
-	User* getUserById(unsigned long);
+	USocial(const USocial& other);
+	USocial& operator=(const USocial& other);
+	User* registerUser(std::string username, bool isBusiness = false);
+	void removeUser(User* user);
+	User* getUserById(unsigned long userId);
 };

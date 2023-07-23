@@ -9,7 +9,7 @@ private:
     std::string username;
     std::string otherUsername;
 public:
-    NotAFriendException(const std::string, const std::string);
+    NotAFriendException(const std::string username, const std::string otherUsername);
     std::string getUserName();
     std::string getOtherUserName();
 };

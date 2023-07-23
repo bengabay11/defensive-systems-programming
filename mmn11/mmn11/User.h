@@ -16,20 +16,20 @@ protected:
 	std::list<unsigned long> friends;
 	std::list<Post* > posts;
 	std::list<Message*> receivedMsgs;
-	User();
+	User(USocial* us, unsigned long id, std::string name);
 	~User();
-	User(const User&);
+	User(const User& other);
 	User& operator=(const User& other);
 public:
 	unsigned long getId();
 	std::string getName();
 	void addFriend(User* user);
-	void removeFriend(User*);
-	void post(std::string);
-	void post(std::string, Media*);
+	void removeFriend(User* user);
+	void post(std::string text);
+	void post(std::string text, Media* media);
 	std::list<Post*> getPosts();
 	void viewFriendsPosts();
-	void receiveMessage(Message*);
-	virtual void sendMessage(User*, Message*);
+	void receiveMessage(Message* message);
+	virtual void sendMessage(User* user, Message* message);
 	void viewReceivedMessages();
 };
