@@ -2,9 +2,9 @@
 
 class Point
 {
-   int* _coord;
+	int* _coord;
 public:
-   Point()
+	Point()
    {
       _coord = new int[2];
       _coord[0] = _coord[1] = 0;
@@ -37,7 +37,7 @@ public:
    }
 };
 
-int example()
+int main()
 {
    Point p1(1, 2);
    Point p2 = p1;
