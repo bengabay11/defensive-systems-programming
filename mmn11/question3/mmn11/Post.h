@@ -13,8 +13,7 @@ public:
 	~Post();
 	Post(const Post& other);
 	Post& operator=(const Post& other);
-	std::string getText() const;
-	Media* getMedia() const;
+	std::string getText();
+	Media* getMedia() ;
+	friend std::ostream& operator<< (std::ostream& out, const Post& post);
 };
-
-std::ostream& operator<< (std::ostream& out, const Post& post);

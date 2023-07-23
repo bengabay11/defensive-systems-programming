@@ -6,13 +6,13 @@ Message::Message(std::string text)
     this->text = text;
 }
 
-std::string Message::getText() const
+std::string Message::getText()
 {
     return this->text;
 }
 
 std::ostream& operator<<(std::ostream& out, const Message& message)
 {
-    std::cout << message.getText() << std::endl;
+    std::cout << message.text << std::endl;
     return out;
 }

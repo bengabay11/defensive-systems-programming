@@ -7,7 +7,6 @@ private:
 	std::string text;
 public:
 	Message(std::string text);
-	std::string getText() const;
+	std::string getText();
+	friend std::ostream& operator<< (std::ostream& out, const Message& message);
 };
-
-std::ostream& operator << (std::ostream& out, const Message& message);

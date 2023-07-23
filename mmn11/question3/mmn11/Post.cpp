@@ -34,20 +34,20 @@ Post& Post::operator=(const Post& other)
     return *this;
 }
 
-std::string Post::getText() const
+std::string Post::getText()
 {
     return this->text;
 }
 
-Media* Post::getMedia() const
+Media* Post::getMedia()
 {
     return this->media;
 }
 
 std::ostream& operator<<(std::ostream& out, const Post& post)
 {
-    out << "Text: " << post.getText() << std::endl;
-    Media* media = post.getMedia();
+    out << "Text: " << post.text << std::endl;
+    Media* media = post.media;
     if (media != nullptr) {
         out << "Media: ";
         media->display();

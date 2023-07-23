@@ -58,6 +58,7 @@ User& User::operator=(const User& other)
 	this->id = other.id;
 	this->name = other.name;
 	this->us = other.us;
+	return *this;
 }
 
 unsigned long User::getId()
