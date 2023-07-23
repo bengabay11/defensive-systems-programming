@@ -10,6 +10,31 @@ Post::~Post()
     delete this->media;
 }
 
+Post::Post(const Post& other): text(other.text), media(nullptr)
+{
+    this->text = other.text;
+    if (other.media) {
+        this->media = other.media->clone();
+    }
+}
+
+Post& Post::operator=(const Post& other)
+{
+    if (this == &other) {
+        return *this;
+    }
+
+    delete this->media;
+    this->media = nullptr;
+    if (other.media) {
+        this->media = other.media->clone();
+    }
+
+    this->text = other.text;
+
+    return *this;
+}
+
 std::string Post::getText() const
 {
     return this->text;

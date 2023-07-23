@@ -7,4 +7,5 @@ class Video :
 {
 public:
     void display() override;
+    Media* clone() const override;
 };

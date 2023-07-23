@@ -11,6 +11,8 @@ public:
 	Post(std::string text);
 	Post(std::string text, Media* media);
 	~Post();
+	Post(const Post& other);
+	Post& operator=(const Post& other);
 	std::string getText() const;
 	Media* getMedia() const;
 };

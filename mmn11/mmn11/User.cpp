@@ -4,17 +4,61 @@
 #include "FriendAlreadyExistsException.h"
 #include "NotAFriendException.h"
 
-User::User() {}
+User::User() : us(nullptr), id(0), name("") {}
 
 User::~User()
 {
-	delete this->us;
 	for (auto post : this->posts) {
 		delete post;
 	}
 	for (auto message : this->receivedMsgs) {
 		delete message;
 	}
+}
+
+User::User(const User& other): id(other.id), name(other.name), posts(), receivedMsgs()
+{
+	this->us = other.us;
+	for (unsigned long friendId : other.friends) {
+		friends.push_back(friendId);
+	}
+	for (auto post : other.posts) {
+		this->posts.push_back(new Post(*post));
+	}
+	for (auto message : other.receivedMsgs) {
+		this->receivedMsgs.push_back(new Message(*message));
+	}
+}
+
+User& User::operator=(const User& other)
+{
+	if (this == &other) {
+		return *this;
+	}
+
+	for (auto post : this->posts) {
+		delete post;
+	}
+	for (auto message : this->receivedMsgs) {
+		delete message;
+	}
+
+	this->friends.clear();
+	this->posts.clear();
+	this->receivedMsgs.clear();
+	for (unsigned long friendId : other.friends) {
+		friends.push_back(friendId);
+	}
+	for (auto post : other.posts) {
+		this->posts.push_back(new Post(*post));
+	}
+	for (auto message : this->receivedMsgs) {
+		this->receivedMsgs.push_back(new Message(*message));
+	}
+
+	this->id = other.id;
+	this->name = other.name;
+	this->us = other.us;
 }
 
 unsigned long User::getId()

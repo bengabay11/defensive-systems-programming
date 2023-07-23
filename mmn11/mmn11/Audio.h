@@ -7,4 +7,5 @@ class Audio :
 {
 public:
     void display() override;
+    Media* clone() const override;
 };

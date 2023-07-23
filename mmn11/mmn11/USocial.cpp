@@ -1,6 +1,42 @@
 #include "USocial.h"
 #include "BusinessUser.h"
 
+USocial::USocial() : idCounter(0) {}
+
+USocial::~USocial()
+{
+	for (auto it = users.begin(); it != users.end(); ++it) {
+		delete it->second;
+	}
+}
+
+USocial::USocial(const USocial& other)
+{
+	this->idCounter = other.idCounter;
+	for (const auto& pair : other.users) {
+		users[pair.first] = new User(*pair.second);
+	}
+}
+
+USocial& USocial::operator=(const USocial& other)
+{
+	if (this == &other) {
+		return *this;
+	}
+
+	for (auto it = users.begin(); it != users.end(); ++it) {
+		delete it->second;
+	}
+	this->users.clear();
+
+	this->idCounter = other.idCounter;
+	for (const auto& pair : other.users) {
+		this->users[pair.first] = new User(*pair.second);
+	}
+
+	return *this;
+}
+
 /**
  * @brief Register a new user for USocial.
  * 

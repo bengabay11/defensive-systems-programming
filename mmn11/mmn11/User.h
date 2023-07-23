@@ -18,6 +18,8 @@ protected:
 	std::list<Message*> receivedMsgs;
 	User();
 	~User();
+	User(const User&);
+	User& operator=(const User& other);
 public:
 	unsigned long getId();
 	std::string getName();

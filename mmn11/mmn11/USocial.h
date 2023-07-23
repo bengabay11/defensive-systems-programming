@@ -12,6 +12,10 @@ private:
 	unsigned long idCounter;
 	std::map<unsigned long, User*> users;
 public:
+	USocial();
+	~USocial();
+	USocial(const USocial&);
+	USocial& operator=(const USocial&);
 	User* registerUser(std::string, bool = false);
 	void removeUser(User*);
 	User* getUserById(unsigned long);
