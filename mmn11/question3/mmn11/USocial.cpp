@@ -49,11 +49,14 @@ User* USocial::registerUser(std::string username, bool isBusiness)
 {
 	User* newUser;
 	if (isBusiness) {
-		newUser = new BusinessUser(this, this->idCounter++, username);
+		newUser = new BusinessUser();
 	}
 	else {
-		newUser = new User(this, this->idCounter++, username);
+		newUser = new User();
 	}
+	newUser->id = this->idCounter++;
+	newUser->name = username;
+	newUser->us = this;
 	this->users.insert(std::make_pair(newUser->getId(), newUser));
 	return newUser;
 }

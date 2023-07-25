@@ -16,7 +16,7 @@ protected:
 	std::list<unsigned long> friends;
 	std::list<Post* > posts;
 	std::list<Message*> receivedMsgs;
-	User(USocial* us, unsigned long id, std::string name);
+	User();
 	~User();
 	User(const User& other);
 	User& operator=(const User& other);

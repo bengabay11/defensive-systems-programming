@@ -4,7 +4,7 @@
 #include "FriendAlreadyExistsException.h"
 #include "NotAFriendException.h"
 
-User::User(USocial* us, unsigned long id, std::string name) : us(us), id(id), name(name) {}
+User::User() {}
 
 User::~User()
 {
