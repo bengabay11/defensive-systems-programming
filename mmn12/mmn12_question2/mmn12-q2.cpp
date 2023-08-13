@@ -100,8 +100,6 @@ char* dupenv(const char* varname)
 
    char* buff = NULL;
    size_t cnt;
-   if (_dupenv_s(&buff, &cnt, varname) != 0)
-      return NULL;
    return buff;
 
 #elif defined(__linux__)

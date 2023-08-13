@@ -1,0 +1,36 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build (Release)",
+			"type": "shell",
+			"command": "g++",
+			"args": [
+				"-O3", // Optimization level for release build
+				"${workspaceFolder}/src/main.cpp",
+				"-o",
+				"${workspaceFolder}/dist/release/mmn12-q1"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"label": "Build (Debug)",
+			"type": "shell",
+			"command": "g++",
+			"args": [
+				"-g3",
+				"-g", // Generate debug information
+				"${workspaceFolder}/src/main.cpp",
+				"-o",
+				"${workspaceFolder}/dist/debug/mmn12-q1"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		}
+	]
+}

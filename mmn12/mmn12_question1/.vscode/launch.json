@@ -1,0 +1,56 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Run C++ - Release",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/dist/release/mmn12-q1",
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			],
+			"preLaunchTask": "Build (Release)",
+			"miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe"
+		},
+		{
+			"name": "Debug C++",
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/dist/debug/mmn12-q1",
+			"args": ["-e", "\\\\xAAAAAAAAAAAAAAA\\xc0"],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [
+				{
+					"name": "ECHOUTIL_OPT_ON",
+					"value": "test"
+				},
+				{
+					"name": "GCC_STACK_PROTECTOR",
+					"value": "0"
+				}
+			],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"setupCommands": [
+				{
+					"description": "Enable pretty-printing for gdb",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			],
+			"preLaunchTask": "Build (Debug)",
+			"miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe"
+		}
+	]
+}

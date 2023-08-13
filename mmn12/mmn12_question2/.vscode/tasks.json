@@ -1,0 +1,71 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build mmn12-q2.cpp (Release)",
+			"type": "shell",
+			"command": "g++",
+			"args": [
+				"-m32", // Set the target binary to x86
+				"-O3", // Optimization level for release build
+				"${workspaceFolder}/mmn12-q2.cpp",
+				"-o",
+				"${workspaceFolder}/dist/release/mmn12-q2"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"label": "Build mmn12-q2.cpp (Debug)",
+			"type": "shell",
+			"command": "g++",
+			"args": [
+				"-g3",
+				"-m32", // Set the target binary to x86
+				"-g", // Generate debug information
+				"${workspaceFolder}/mmn12-q2.cpp",
+				"-o",
+				"${workspaceFolder}/dist/debug/mmn12-q2"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"label": "Build fix-mmn12-q2.cpp (Release)",
+			"type": "shell",
+			"command": "g++",
+			"args": [
+				"-m32", // Set the target binary to x86
+				"-O3", // Optimization level for release build
+				"${workspaceFolder}/fix-mmn12-q2.cpp",
+				"-o",
+				"${workspaceFolder}/dist/release/fix-mmn12-q2"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"label": "Build fix-mmn12-q2.cpp (Debug)",
+			"type": "shell",
+			"command": "g++",
+			"args": [
+				"-g3",
+				"-m32", // Set the target binary to x86
+				"-g", // Generate debug information
+				"${workspaceFolder}/fix-mmn12-q2.cpp",
+				"-o",
+				"${workspaceFolder}/dist/debug/fix-mmn12-q2"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		}
+	]
+}
