@@ -1,18 +1,13 @@
 
 
 class BankAccount:
-    def __init__(self, account_name: str, balance: int):
-        self.name = account_name
-        self.amt = balance
+    def __init__(self, name: str, amt: int) -> None:
+        self.name = name
+        self.amt = amt
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Your account, {self.name}, has {self.amt} dollars."
 
 
-def main():
-    t1 = BankAccount("Bob", 100)
-    print(t1)
-
-
-if __name__ == '__main__':
-    main()
+t1 = BankAccount("Bob", 100)
+print(t1)

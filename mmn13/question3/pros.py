@@ -30,40 +30,41 @@ class Politician(User):
 
 class ElectricalEngineer(Engineer):
     def __init__(self, name: str) -> None:
-        super().__init__(name)
+        User.__init__(name, "Electrical Engineer")
 
 
 class ComputerEngineer(Engineer):
     def __init__(self, name: str) -> None:
-        super().__init__(name)
+        User.__init__(name, "Computer Engineer")
 
 
 class MechanicalEngineer(Engineer):
-    pass
+    def __init__(self, name: str) -> None:
+        User.__init__(self, name, "Mechanical Engineer")
 
 
-def get_class(class_name: str) -> any:
+def get_live_class(class_name: str) -> any:
     for name, obj in inspect.getmembers(sys.modules[__name__]):
         if class_name == name and inspect.isclass(obj):
             return obj
+    raise Exception(f"Class '{class_name}' not found in current module.")
 
 
 def main():
     class_name = input("Please enter the name of new class: ")
-    base_class_name = input(
-        "Please enter name of base class (blank if none): ")
-    new_method_class = input(
-        f"Please enter name of new method for class {class_name}: ")
-    new_attribute_class = input(
-        f"Please enter name of new attribute for class {class_name}:")
-    base_class = get_class(base_class_name)
-    if base_class:
-        bases = (base_class,)
-    else:
-        bases = ()
-    new_class = type(class_name, bases, {
-                     new_method_class: None, new_attribute_class: None})
-    # new_class_instance = new_class()
+    base_class_name = input("Please enter name of base class (blank if none): ")
+    method_name = input(f"Please enter name of new method for class {class_name}: ")
+    attribute_name = input(f"Please enter name of new attribute for class {class_name}:")
+
+    base_classes = ()
+    if base_class_name:
+        base_class = get_live_class(base_class_name)
+        base_classes = (base_class,)
+
+    new_class = type(class_name, base_classes, {
+        method_name: lambda: None,
+        attribute_name: None
+    })
     print(
         f"Class Student created with base class: {new_class.__bases__[0].__name__}")
     print(f"Class __name__ is: {new_class.__name__}")
