@@ -11,8 +11,8 @@ class AppleBasket:
     def increase(self) -> None:
         self.apple_quantity += 1
 
-
-apple_basket1 = AppleBasket("red", 4)
-apple_basket2 = AppleBasket("blue", 50)
-print(apple_basket1)
-print(apple_basket2)
+if __name__ == "__main__":
+    apple_basket1 = AppleBasket("red", 4)
+    apple_basket2 = AppleBasket("blue", 50)
+    print(apple_basket1)
+    print(apple_basket2)

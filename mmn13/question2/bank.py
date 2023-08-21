@@ -8,6 +8,6 @@ class BankAccount:
     def __str__(self) -> str:
         return f"Your account, {self.name}, has {self.amt} dollars."
 
-
-t1 = BankAccount("Bob", 100)
-print(t1)
+if __name__ == "__main__":
+    t1 = BankAccount("Bob", 100)
+    print(t1)

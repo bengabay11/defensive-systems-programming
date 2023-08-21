@@ -7,4 +7,5 @@ for amount in rainfall_amounts:
     if float(amount) > 75:
         num_rainy_months += 1
 
-print(f"There are {num_rainy_months} months of rainy weather")
+if __name__ == "__main__":
+    print(f"There are {num_rainy_months} months of rainy weather")

@@ -9,4 +9,5 @@ for word in words:
     else:
         past_tense.append(word + "ed")
 
-print(past_tense)
+if __name__ == "__main__":
+    print(past_tense)
