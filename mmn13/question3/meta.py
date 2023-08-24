@@ -5,16 +5,19 @@ import sys
 
 
 class Replicator:
-    def deco(self, func, code):
-        def ret(*args, **kwargs):
-            eval(code)
-            return func(*args, **kwargs)
-        return ret
+    def __init__(self, python_code: str) -> None:
+        self.python_code = python_code
 
-    def affect(self, cls, code):
+    def decorator(self, func):
+        def inner(*args, **kwargs):
+            eval(self.python_code)
+            return func(*args, **kwargs)
+        return inner
+
+    def affect(self, cls):
         for attr, item in cls.__dict__.items():
             if callable(item):
-                setattr(cls, attr, self.deco(item, code))
+                setattr(cls, attr, self.decorator(item))
 
 
 def get_first_class_from_file(python_filename: str) -> any:
@@ -41,8 +44,8 @@ def main():
     first_class_instance1 = first_class("red", 4)
     first_class_instance2 = first_class("blue", 50)
     python_code = input("Enter a python code: ")
-    replicator = Replicator()
-    replicator.affect(first_class, python_code)
+    replicator = Replicator(python_code)
+    replicator.affect(first_class)
 
     call_class_methods(first_class_instance1)
     call_class_methods(first_class_instance2)
