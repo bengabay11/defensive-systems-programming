@@ -30,7 +30,7 @@ def get_first_class_from_file(python_filename: str) -> any:
         module) if inspect.isclass(obj)]
     if file_classes:
         return file_classes[0]
-    raise Exception(f"No classes found in file - '{python_filename}'")
+    raise Exception(f"No class found in file - '{python_filename}'")
 
 
 def init_dynamic_params(function: Callable, str_value: str, int_value: int) -> dict:
@@ -62,9 +62,6 @@ def create_dynamic_class_instance(cls: any, str_value: str, int_value: int) -> a
 def main() -> None:
     python_filename = input("Enter python file name: ")
     first_class = get_first_class_from_file(python_filename)
-    if first_class is None:
-        print(f"No class found in file {python_filename}.")
-        sys.exit(1)
     first_class_instance1 = create_dynamic_class_instance(first_class, "red", 4)
     first_class_instance2 = create_dynamic_class_instance(first_class, "blue", 50)
     python_code = input("Enter a python code: ")
