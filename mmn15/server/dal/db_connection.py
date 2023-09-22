@@ -7,7 +7,7 @@ from contextlib import contextmanager
 
 from sqlalchemy.orm import sessionmaker
 
-from server.dal.models.base import Base
+from dal.models.base import Base
 
 
 @contextmanager
@@ -27,7 +27,7 @@ class DBConnection(object):
         self._session_class = None
 
     def connect(self, protocol: str, database: str) -> None:
-        url = f"{protocol}://{database}"
+        url = f"{protocol}:///{database}"
         engine = create_engine(url)
         self._session_class = sessionmaker(bind=engine)
         self._connection = engine.connect()
