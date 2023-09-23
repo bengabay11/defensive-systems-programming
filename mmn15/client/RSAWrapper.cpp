@@ -86,6 +86,12 @@ char* RSAPrivateWrapper::getPrivateKey(char* keyout, unsigned int length) const
 	return keyout;
 }
 
+void RSAPrivateWrapper::setPrivateKey(const std::string& key)
+{
+	CryptoPP::StringSource source(key, true);
+	_privateKey.Load(source);
+}
+
 std::string RSAPrivateWrapper::getPublicKey() const
 {
 	CryptoPP::RSAFunction publicKey(_privateKey);

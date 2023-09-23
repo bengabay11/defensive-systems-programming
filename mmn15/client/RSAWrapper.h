@@ -2,6 +2,7 @@
 
 #include <osrng.h>
 #include <rsa.h>
+#include <winsock.h>
 
 #include <string>
 
@@ -52,6 +53,7 @@ public:
 
 	std::string getPrivateKey() const;
 	char* getPrivateKey(char* keyout, unsigned int length) const;
+	void setPrivateKey(const std::string& key);
 
 	std::string getPublicKey() const;
 	char* getPublicKey(char* keyout, unsigned int length) const;

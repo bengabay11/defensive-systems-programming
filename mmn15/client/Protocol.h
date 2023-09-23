@@ -1,25 +1,12 @@
 #pragma once
 
-#include "Consts.h"
 #include <cstdio>
 #include <stdint.h>
 #include <Windows.h>
-#include "Structs.h"
+#include <boost/algorithm/hex.hpp>
+#include <boost/algorithm/string.hpp>
 
-struct ClientLoginData
-{
-	char id[Consts::CLIENT_ID_SIZE];
-	char name[Consts::CLIENT_NAME_SIZE];
-	char aesKey[Consts::DECRYPTED_AES_KEY_SIZE];
-};
-
-struct TransferFileContent
-{
-	std::string host;
-	int port;
-	char name[Consts::CLIENT_NAME_SIZE];
-	std::string filePath;
-};
+#include "Consts.h"
 
 #pragma pack(1)
 struct RequesttHeader
@@ -48,7 +35,7 @@ struct RegisterRequest
 struct ExchangeKeysRequest
 {
 	char name[Consts::CLIENT_NAME_SIZE];
-	char rsa_public_key[Consts::RSA_PUBLIC_KEY_SIZE];
+	char rsaPublicKey[Consts::RSA_PUBLIC_KEY_SIZE];
 };
 
 #pragma pack(1)
@@ -61,20 +48,20 @@ struct FileUploadRequest
 #pragma pack(1)
 struct CRCRequest
 {
-	char fileName[Consts::FILE_NAME_SIZE];
+	char filename[Consts::FILE_NAME_SIZE];
 };
 
 #pragma pack(1)
 struct RegisterResponse
 {
-	char client_id[Consts::CLIENT_ID_SIZE];
+	char clientId[Consts::CLIENT_ID_SIZE];
 };
 
 #pragma pack(1)
 struct LoginResponse
 {
-	char client_id[Consts::CLIENT_ID_SIZE];
-	char aes_key[Consts::ENCRYPTED_AES_KEY_SIZE];
+	char clientId[Consts::CLIENT_ID_SIZE];
+	char encryptedAESKey[Consts::ENCRYPTED_AES_KEY_SIZE];
 };
 
 #pragma pack(1)

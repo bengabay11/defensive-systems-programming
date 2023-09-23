@@ -1,10 +1,12 @@
 from logging import error, info
+import os
 from socket import AF_INET, SOCK_STREAM, SOL_SOCKET, socket, SO_REUSEADDR
 from threading import Thread
 
 import protocol
 from request_router import handle_request
 from dal.server_db import ServerDB
+import config
 
 
 class Server(object):
@@ -17,6 +19,9 @@ class Server(object):
         self.socket.bind((self.host, self.port))
 
     def run(self, max_clients):
+        if not os.path.isdir(config.UPLOADED_FILES_DIRECTORY):
+            info(f"Uploaded files directory not exist. Creating it - '{config.UPLOADED_FILES_DIRECTORY}'")
+            os.mkdir(config.UPLOADED_FILES_DIRECTORY)
         self.socket.listen(max_clients)
         while True:
             client_socket, address = self.socket.accept()
@@ -30,8 +35,7 @@ class Server(object):
             try:
                 request_header = protocol.get_request_header(client_socket)
                 info(f"Received request header from {request_header}")
-                payload = client_socket.recv(request_header.payload_size)
-                response_code, payload = handle_request(request_header, payload, server_db)
+                response_code, payload = handle_request(client_socket, request_header, server_db)
                 info(f"Sending response to {client_socket}, Code={response_code}")
                 protocol.send_response(client_socket, response_code.value, payload)
             except Exception as exception:

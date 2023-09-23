@@ -1,13 +1,5 @@
 #include "AESWrapper.h"
 
-#include <modes.h>
-#include <aes.h>
-#include <filters.h>
-
-#include <stdexcept>
-#include <immintrin.h>	// _rdrand32_step
-
-
 unsigned char* AESWrapper::GenerateKey(unsigned char* buffer, unsigned int length)
 {
 	for (size_t i = 0; i < length; i += sizeof(unsigned int))
@@ -34,6 +26,11 @@ AESWrapper::~AESWrapper()
 const unsigned char* AESWrapper::getKey() const 
 { 
 	return _key; 
+}
+
+const void AESWrapper::setKey(unsigned char* key)
+{
+	memcpy_s(_key, DEFAULT_KEYLENGTH, key, DEFAULT_KEYLENGTH);
 }
 
 std::string AESWrapper::encrypt(const char* plain, unsigned int length)

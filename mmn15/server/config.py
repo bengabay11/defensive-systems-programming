@@ -14,3 +14,5 @@ DB_PROTOCOL = "sqlite"
 current_file_path = os.path.abspath(__file__)
 server_folder = os.path.dirname(current_file_path)
 DB_PATH = os.path.join(server_folder, "defensive.db")
+
+UPLOADED_FILES_DIRECTORY = os.path.join(os.getcwd(), "server", "files")

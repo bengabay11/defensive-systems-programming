@@ -3,22 +3,7 @@ from typing import Type, Any
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from contextlib import contextmanager
-
-from sqlalchemy.orm import sessionmaker
-
 from dal.models.base import Base
-
-
-@contextmanager
-def session_scope(session_class: sessionmaker) -> None:
-    session = session_class()
-    try:
-        yield session
-        session.commit()
-    except:
-        session.rollback()
-        raise
 
 
 class DBConnection(object):
@@ -29,28 +14,28 @@ class DBConnection(object):
     def connect(self, protocol: str, database: str) -> None:
         url = f"{protocol}:///{database}"
         engine = create_engine(url)
-        self._session_class = sessionmaker(bind=engine)
+        session_maker = sessionmaker(bind=engine)
+        self._session = session_maker()
         self._connection = engine.connect()
 
-    def select(self, model: Type[Base], filters: tuple = (), serializable: bool = False) -> list:
-        with session_scope(self._session_class) as session:
-            query = session.query(model).filter(*filters)
-            results = query.all()
-            return [result.json() for result in results] if serializable else results
+    def select(self, model: Type[Base], filters: tuple = ()) -> list:
+        query = self._session.query(model).filter(*filters)
+        return query.all()
 
     def insert(self, row: Base) -> None:
-        with session_scope(self._session_class) as session:
-            session.add(row)
+        self._session.add(row)
+        self._session.commit()
 
     def update(self, model: Type[Base], filters: tuple, column: Any, new_value: Any) -> None:
-        with session_scope(self._session_class) as session:
-            row = session.query(model).filter(*filters).one()
-            setattr(row, column, new_value)
+        row = self._session.query(model).filter(*filters).one()
+        setattr(row, column, new_value)
+        self._session.commit()
 
     def delete(self, model: Type[Base], filters: tuple) -> None:
-        with session_scope(self._session_class) as session:
-            row = session.query(model).filter(*filters).one()
-            session.delete(row)
+        row = self._session.query(model).filter(*filters).one()
+        self._session.delete(row)
+        self._session.commit()
 
     def close(self) -> None:
+        self._session.close()
         self._connection.close()

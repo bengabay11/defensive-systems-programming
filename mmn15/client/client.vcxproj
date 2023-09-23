@@ -116,13 +116,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\Code\git_repositories\defensive-systems-programming\mmn15\client\boost_1_83_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\git_repositories\defensive-systems-programming\mmn15\client\libs\CryptoPP;D:\Code\git_repositories\defensive-systems-programming\mmn15\client\libs\boost_1_83_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
+      <AdditionalDependencies>D:\Code\git_repositories\defensive-systems-programming\mmn15\client\libs\CryptoPP\x64\Output\Debug\cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
@@ -145,17 +148,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AESWrapper.cpp" />
+    <ClCompile Include="Base64Wrapper.cpp" />
     <ClCompile Include="Client.cpp" />
+    <ClCompile Include="ClientCRC.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="RSACipher.cpp" />
+    <ClCompile Include="RSAWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AESWrapper.h" />
+    <ClInclude Include="Base64Wrapper.h" />
     <ClInclude Include="Client.h" />
+    <ClInclude Include="ClientCRC.h" />
     <ClInclude Include="ClientSocket.h" />
     <ClInclude Include="Consts.h" />
-    <ClInclude Include="RSACipher.h" />
-    <ClInclude Include="Structs.h" />
+    <ClInclude Include="Dataclasses.h" />
+    <ClInclude Include="RSAWrapper.h" />
+    <ClInclude Include="Protocol.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="client.rc" />

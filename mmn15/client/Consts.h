@@ -33,7 +33,7 @@ namespace Consts
 	const size_t CLIENT_ID_SIZE = 16;
 	const size_t CLIENT_NAME_SIZE = 255;
 
-	const int RETRY_COUNT = 3;
+	const int UPLOAD_FILE_MAX_RETRIES = 3;
 
 	const size_t FILE_NAME_SIZE = 255;
 
