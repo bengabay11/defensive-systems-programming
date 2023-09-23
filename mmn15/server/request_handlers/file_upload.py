@@ -84,9 +84,9 @@ class FileUploadRequestHandler(BaseRequestHandler):
         file_path = os.path.join(base_folder, filename)
         file = File(id=client_id, file_name=filename, path_name=file_path, verified=False)
         server_db.files.insert_file(file)
-        with open(file.path_name, "wb") as f:
-            f.write(file_content)
-            f.flush()
+        with open(file_path, "wb") as file_object:
+            file_object.write(file_content)
+            file_object.flush()
 
     @staticmethod
     def calculate_crc(content: bytes) -> int:

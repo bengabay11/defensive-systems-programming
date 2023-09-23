@@ -31,6 +31,7 @@ def main():
         datefmt=config.LOGGING_DATE_FORMAT
     )
     db_connection = DBConnection()
+    info(f"Connecting to database at {config.DB_PATH}")
     db_connection.connect(config.DB_PROTOCOL, config.DB_PATH)
     server_db = ServerDB(db_connection)
     info(f'Loading port from {PORT_FILE_PATH}')
