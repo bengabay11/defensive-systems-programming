@@ -153,6 +153,7 @@
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientCRC.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
+    <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RSAWrapper.cpp" />
   </ItemGroup>
@@ -163,9 +164,9 @@
     <ClInclude Include="ClientCRC.h" />
     <ClInclude Include="ClientSocket.h" />
     <ClInclude Include="Consts.h" />
-    <ClInclude Include="Dataclasses.h" />
+    <ClInclude Include="Exceptions.h" />
     <ClInclude Include="RSAWrapper.h" />
-    <ClInclude Include="Protocol.h" />
+    <ClInclude Include="Structs.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="client.rc" />

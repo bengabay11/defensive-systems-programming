@@ -52,7 +52,6 @@ class DBConnection(object):
     @with_session
     def update(self, session: Session, model: Type[Base], filters: tuple, column: Any, new_value: Any) -> None:
         row = session.query(model).filter(*filters).one()
-        session.refresh(row)
         setattr(row, column, new_value)
 
     @with_session

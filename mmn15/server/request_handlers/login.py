@@ -8,6 +8,7 @@ from protocol import ResponseCodes
 from protocol import RequestHeader
 import cipher
 from errors import LoginFailError
+from request_handlers.common import authenticate_client
 
 
 class LoginRequestHandler(BaseRequestHandler):
@@ -21,8 +22,8 @@ class LoginRequestHandler(BaseRequestHandler):
     
     @staticmethod
     def login_client(client_id: uuid.UUID, client_name: str, server_db: ServerDB) -> bytes:
-        client = server_db.clients.get_client_by_id(client_id)
-        if not client or client.name != client_name:
+        client = authenticate_client(client_id, server_db)
+        if client.name != client_name:
             raise LoginFailError(client_id, client_name)
         aes_key = cipher.generate_aes_key()
         encrypted_aes_key = cipher.encrypt_aes_key(aes_key, client.public_key)

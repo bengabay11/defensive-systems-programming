@@ -19,7 +19,7 @@ void Client::run()
 ClientHolder Client::initialize(char fallbackClientName[Consts::CLIENT_NAME_SIZE]) {
 	ClientHolder clientHolder{};
 	std::ifstream loginFile;
-	loginFile.open(Consts::CLIENT_DETAILS_FILENAME);
+	loginFile.open(Consts::LOGIN_DETAILS_FILENAME);
 	if (loginFile.is_open()) {
 		std::cout << "Parsing login file" << std::endl;
 		ClientLoginData clientLoginData = this->parseLoginFile();
@@ -44,7 +44,7 @@ ClientHolder Client::initialize(char fallbackClientName[Consts::CLIENT_NAME_SIZE
 	return clientHolder;
 }
 
-void Client::sendRequest(char clientId[Consts::CLIENT_ID_SIZE], int requestCode, char* payloadBuffer, long payloadSize)
+void Client::sendRequest(char clientId[Consts::CLIENT_ID_SIZE], short requestCode, char* payloadBuffer, long payloadSize)
 {
 	RequesttHeader requestHeader{};
 	memcpy(requestHeader.client_id, clientId, Consts::CLIENT_ID_SIZE);
@@ -84,15 +84,14 @@ TransferFileContent Client::parseTransferFile()
 		return transferFileContent;
 	}
 	else {
-		std::cerr << "Couldn't open transfer file" << std::endl;
-		exit(1);
+		throw OpenFileFailException(Consts::TRANSFER_DETAILS_FILENAME);
 	}
 }
 
 ClientLoginData Client::parseLoginFile()
 {
 	std::fstream meFile;
-	meFile.open(Consts::CLIENT_DETAILS_FILENAME);
+	meFile.open(Consts::LOGIN_DETAILS_FILENAME);
 	if (meFile.is_open()) {
 		ClientLoginData clientLoginData{};
 		std::string clientName, encodedClientId, encodedPrivateRSAKey;
@@ -106,8 +105,7 @@ ClientLoginData Client::parseLoginFile()
 		return clientLoginData;
 	}
 	else {
-		std::cerr << "Couldn't open open login file" << std::endl;
-		exit(1);
+		throw OpenFileFailException(Consts::LOGIN_DETAILS_FILENAME);
 	}
 }
 
@@ -123,18 +121,15 @@ RegisterResponse Client::registerClient(char clientName[Consts::CLIENT_NAME_SIZE
 	if (responseHeader.code == Consts::ResponseCodes::REGISTRATION_SUCCESS) {
 		RegisterResponse registerResponse{};
 		char* registerResponseBuffer = reinterpret_cast<char*>(&registerResponse);
-		this->clientSocket->receive(registerResponseBuffer, responseHeader.payloadSize);
+		this->clientSocket->receive(registerResponseBuffer, sizeof(registerResponse));
 		return registerResponse;
 	}
 	else if (responseHeader.code == Consts::ResponseCodes::REGISTRATION_FAIL) {
-		std::cerr << "Registration faield, Client with the same name already exists." << std::endl;
-		exit(1);
+		throw RegistrationFailedException(clientName);
 	}
-	else if (responseHeader.code == Consts::ResponseCodes::GENERAL_SERVER_ERROR) {
-		std::cerr << "Registration faield, general server error." << std::endl;
-		exit(1);
+	else {
+		this->handleResponseError(responseHeader);
 	}
-
 }
 
 LoginResponse Client::login(char clientId[Consts::CLIENT_ID_SIZE], char clientName[Consts::CLIENT_NAME_SIZE])
@@ -152,12 +147,10 @@ LoginResponse Client::login(char clientId[Consts::CLIENT_ID_SIZE], char clientNa
 		return loginResponse;
 	}
 	else if (responseHeader.code == Consts::ResponseCodes::LOGIN_DECLINED) {
-		std::cerr << "Login rejected" << std::endl;
-		exit(1);
+		throw LoginDeclinedException();
 	}
 	else {
-		std::cerr << "General server error" << std::endl;
-		exit(1);
+		this->handleResponseError(responseHeader);
 	}
 }
 
@@ -182,8 +175,7 @@ ExchangeKeysResponse Client::receiveAESKey(char clientName[Consts::CLIENT_NAME_S
 		return exchangeKeysResponse;
 	}
 	else {
-		std::cerr << "Server failed to accept public key" << std::endl;
-		exit(1);
+		this->handleResponseError(responseHeader);
 	}
 }
 
@@ -226,7 +218,7 @@ void Client::uploadFileWithRetries(char clientId[Consts::CLIENT_ID_SIZE], std::s
 }
 
 void Client::dumpLoginInfo(char clientId[Consts::CLIENT_ID_SIZE], char clientName[Consts::CLIENT_NAME_SIZE]) {
-	char clientHex[Consts::CLIENT_ID_SIZE * 2];
+	std::cout << "Dumping login info to " << Consts::LOGIN_DETAILS_FILENAME << std::endl;
 	std::string hex;
 	this->stream2hex(clientId, Consts::CLIENT_ID_SIZE, hex, true);
 	std::string encodedPrivateKey = Base64Wrapper::encode(this->rsaPrivateWrapper.getPrivateKey());
@@ -235,7 +227,7 @@ void Client::dumpLoginInfo(char clientId[Consts::CLIENT_ID_SIZE], char clientNam
 		encodedPrivateKey.replace(pos, 1, "");
 	}
 
-	std::fstream loginFile(Consts::CLIENT_DETAILS_FILENAME, std::ios::out);
+	std::fstream loginFile(Consts::LOGIN_DETAILS_FILENAME, std::ios::out);
 	if (loginFile.is_open()) {
 		loginFile << clientName << std::endl;
 		loginFile << std::string(hex) << std::endl;
@@ -243,8 +235,7 @@ void Client::dumpLoginInfo(char clientId[Consts::CLIENT_ID_SIZE], char clientNam
 		loginFile.close();
 	}
 	else {
-		std::cerr << "Error opening the login file." << std::endl;
-		exit(1);
+		throw OpenFileFailException(Consts::LOGIN_DETAILS_FILENAME);
 	}
 }
 
@@ -253,8 +244,7 @@ bool Client::uploadFile(char clientId[Consts::CLIENT_ID_SIZE], std::string fileP
 	// Read file
 	std::ifstream inputFile(filePath);
 	if (!inputFile) {
-		std::cerr << "Error opening the file: " << filePath << std::endl;
-		exit(1);
+		throw OpenFileFailException(filePath);
 	}
 	std::string fileContent;
 	std::string line;
@@ -265,15 +255,15 @@ bool Client::uploadFile(char clientId[Consts::CLIENT_ID_SIZE], std::string fileP
 
 	// Calculate File CRC
 	CRC crc;
-	crc.update((u_char*)fileContent.c_str(), fileContent.length());
+	crc.update((u_char*)fileContent.c_str(), (uint32_t)fileContent.length());
 	auto checksum = crc.digest();
 
 	// Encrypt file with AES key
-	auto encryptedFileContent = this->aesWrapper.encrypt(fileContent.c_str(), fileContent.length());
+	auto encryptedFileContent = this->aesWrapper.encrypt(fileContent.c_str(), (unsigned int)fileContent.length());
 
 	// Send upload request to server
 	FileUploadRequest fileUploadRequest{};
-	fileUploadRequest.contentSize = encryptedFileContent.length();
+	fileUploadRequest.contentSize = (long)encryptedFileContent.length();
 	memcpy(fileUploadRequest.fileName, filename, Consts::FILE_NAME_SIZE);
 	char* fileUploadRequestBuffer = reinterpret_cast<char*>(&fileUploadRequest);
 	this->sendRequest(clientId, Consts::RequestCodes::FILE_UPLOAD, fileUploadRequestBuffer, sizeof(fileUploadRequest));
@@ -282,12 +272,11 @@ bool Client::uploadFile(char clientId[Consts::CLIENT_ID_SIZE], std::string fileP
 	if (responseHeader.code == Consts::ResponseCodes::FILE_RECEIVED) {
 		FileUploadResponse fileUploadResponse{};
 		char* fileUploadResponseBuffer = reinterpret_cast<char*>(&fileUploadResponse);
-		this->clientSocket->receive(fileUploadResponseBuffer, responseHeader.payloadSize);
+		this->clientSocket->receive(fileUploadResponseBuffer, sizeof(fileUploadResponse));
 		return checksum == fileUploadResponse.checksum;
 	}
-	else if (responseHeader.code == Consts::ResponseCodes::GENERAL_SERVER_ERROR)  {
-		std::cerr << "General server Error while uploading file - " << filename << " to server" << std::endl;
-		exit(1);
+	else {
+		this->handleResponseError(responseHeader);
 	}
 }
 
@@ -314,9 +303,8 @@ void Client::sendCRCRequest(Consts::RequestCodes requestCode, char clientId[Cons
 		this->clientSocket->receive(fileUploadResponseBuffer, sizeof(crcResponse));
 		std::cout << "Received CRC Response" << std::endl;
 	}
-	else if (responseHeader.code == Consts::ResponseCodes::GENERAL_SERVER_ERROR) {
-		std::cerr << "General server Error while Sending CRC Request. Request code - " << requestCode  << std::endl;
-		exit(1);
+	else {
+		this->handleResponseError(responseHeader);
 	}
 }
 
@@ -333,4 +321,14 @@ void Client::sendInvalidCRCAbort(char clientId[Consts::CLIENT_ID_SIZE], char fil
 void Client::sendValidCRC(char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE])
 {
 	this->sendCRCRequest(Consts::RequestCodes::VALID_CRC, clientId, filename);
+}
+
+void Client::handleResponseError(ResponseHeader responseHeader)
+{
+	if (responseHeader.code == Consts::ResponseCodes::GENERAL_SERVER_ERROR) {
+		throw GeneralServerErrorException();
+	}
+	else {
+		throw UnkownResponseCodeException(responseHeader.code);
+	}
 }

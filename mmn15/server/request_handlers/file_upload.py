@@ -15,6 +15,7 @@ from dal.models.file import File
 from crc import CRC32
 from errors import ClientNotFoundError
 from errors import FileAlreadyExistsError
+from request_handlers.common import authenticate_client
 
 
 METADATA_FORMAT = "<L255s"
@@ -59,14 +60,11 @@ class FileUploadRequestHandler(BaseRequestHandler):
         encrypted_content = FileUploadRequestHandler.receive_file_content(client_socket, content_size)
         file = server_db.files.get_file(client_id, filename)
         if not file:
-            client = server_db.clients.get_client_by_id(client_id)
-            if client:
-                decrypted_content = cipher.decrypt_bytes(client.aes_key, encrypted_content)
-                FileUploadRequestHandler.save_file(base_folder, decrypted_content, client_id, filename, server_db)
-                content_crc = FileUploadRequestHandler.calculate_crc(decrypted_content)
-                return content_crc, decrypted_content
-            else:
-                raise ClientNotFoundError(client_id)
+            client = authenticate_client(client_id, server_db)
+            decrypted_content = cipher.decrypt_bytes(client.aes_key, encrypted_content)
+            FileUploadRequestHandler.save_file(base_folder, decrypted_content, client_id, filename, server_db)
+            content_crc = FileUploadRequestHandler.calculate_crc(decrypted_content)
+            return content_crc, decrypted_content
         else:
             raise FileAlreadyExistsError(client_id, filename)
 

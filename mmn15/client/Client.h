@@ -13,8 +13,9 @@
 #include "Consts.h"
 #include "Base64Wrapper.h"
 #include "AESWrapper.h"
-#include "Dataclasses.h"
 #include "ClientCRC.h"
+#include "Structs.h"
+#include "exceptions.h"
 
 namespace fs = std::filesystem;
 
@@ -24,7 +25,7 @@ private:
 	ClientSocket* clientSocket;
 	RSAPrivateWrapper rsaPrivateWrapper;
 	AESWrapper aesWrapper;
-	void sendRequest(char clientId[Consts::CLIENT_ID_SIZE], int requestCode, char* payloadBuffer, long payloadSize);
+	void sendRequest(char clientId[Consts::CLIENT_ID_SIZE], short requestCode, char* payloadBuffer, long payloadSize);
 	ResponseHeader receiveResponseHeader();
 	TransferFileContent parseTransferFile();
 	ClientLoginData parseLoginFile();
@@ -41,6 +42,7 @@ private:
 	void sendInvalidCRC(char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE]);
 	void sendInvalidCRCAbort(char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE]);
 	void sendValidCRC(char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE]);
+	void handleResponseError(ResponseHeader responseHeader);
 public:
 	Client();
 	void run();

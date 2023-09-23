@@ -43,7 +43,7 @@ namespace Consts
 	const size_t RSA_PUBLIC_KEY_SIZE = RSAPublicWrapper::KEYSIZE;
 
 	constexpr char TRANSFER_DETAILS_FILENAME[] = "transfer.info";
-	constexpr char CLIENT_DETAILS_FILENAME[] = "me.info";
+	constexpr char LOGIN_DETAILS_FILENAME[] = "me.info";
 
 	const size_t BUFFER_SIZE = 2048;
 }
