@@ -1,5 +1,4 @@
 from logging import debug
-import os
 from socket import socket
 from uuid import UUID
 from request_handlers.base import BaseRequestHandler

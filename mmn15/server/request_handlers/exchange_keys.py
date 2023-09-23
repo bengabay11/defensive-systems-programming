@@ -1,5 +1,3 @@
-
-
 from socket import socket
 import struct
 import uuid
@@ -8,7 +6,7 @@ from dal.server_db import ServerDB
 from protocol import ResponseCodes
 import cipher
 from protocol import RequestHeader
-from errors import ClientNotFoundError, UnauthorizedClientError
+from errors import UnauthorizedClientError
 from request_handlers.common import authenticate_client
 
 

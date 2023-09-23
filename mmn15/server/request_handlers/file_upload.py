@@ -13,7 +13,6 @@ import cipher
 import config
 from dal.models.file import File
 from crc import CRC32
-from errors import ClientNotFoundError
 from errors import FileAlreadyExistsError
 from request_handlers.common import authenticate_client
 

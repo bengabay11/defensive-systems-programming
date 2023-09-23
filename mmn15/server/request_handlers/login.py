@@ -1,5 +1,3 @@
-
-
 from socket import socket
 import uuid
 from request_handlers.base import BaseRequestHandler
