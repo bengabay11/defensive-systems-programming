@@ -15,11 +15,12 @@ class FilesTable(object):
         if rows:
             return rows[0]
 
-    def delete_file(self, file: File) -> None:
-        self._db_connection.delete(file)
+    def delete_file(self, client_id: UUID, filename: str) -> None:
+        filters = (File.id == client_id, File.file_name == filename,)
+        self._db_connection.delete(File, filters)
 
     def update_file_verified(self, client_id: UUID, filename: str, verified: bool) -> None:
-        filters = (File.id == client_id, File.file_name == filename,)
+        filters = [File.id == client_id, File.file_name == filename]
         self._db_connection.update(File, filters, "verified", verified)
 
     def insert_file(self, file: File) -> None:

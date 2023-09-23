@@ -1,9 +1,30 @@
+from functools import wraps
 from typing import Type, Any
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
 from dal.models.base import Base
+
+
+def with_session(expire_on_commit=True):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            if self._connection is None:
+                raise Exception("Database connection not established. Call connect() first.")
+            session = self.session_maker(expire_on_commit=expire_on_commit)
+            try:
+                result = func(self, session, *args, **kwargs)
+                session.commit()
+                return result
+            except Exception as e:
+                session.rollback()
+                raise e
+            finally:
+                session.close()
+        return wrapper
+    return decorator
 
 
 class DBConnection(object):
@@ -14,28 +35,27 @@ class DBConnection(object):
     def connect(self, protocol: str, database: str) -> None:
         url = f"{protocol}:///{database}"
         engine = create_engine(url)
-        session_maker = sessionmaker(bind=engine)
-        self._session = session_maker()
+        self.session_maker = sessionmaker(bind=engine)
         self._connection = engine.connect()
 
-    def select(self, model: Type[Base], filters: tuple = ()) -> list:
-        query = self._session.query(model).filter(*filters)
+    @with_session(expire_on_commit=False)
+    def select(self, session: Session, model: Type[Base], filters: tuple = ()) -> list:
+        query = session.query(model).filter(*filters)
         return query.all()
 
-    def insert(self, row: Base) -> None:
-        self._session.add(row)
-        self._session.commit()
+    @with_session(expire_on_commit=False)
+    def insert(self, session: Session, row: Base) -> None:
+        session.add(row)
 
-    def update(self, model: Type[Base], filters: tuple, column: Any, new_value: Any) -> None:
-        row = self._session.query(model).filter(*filters).one()
+    @with_session()
+    def update(self, session: Session, model: Type[Base], filters: tuple, column: Any, new_value: Any) -> None:
+        row = session.query(model).filter(*filters).first()
         setattr(row, column, new_value)
-        self._session.commit()
 
-    def delete(self, model: Type[Base], filters: tuple) -> None:
-        row = self._session.query(model).filter(*filters).one()
-        self._session.delete(row)
-        self._session.commit()
+    @with_session()
+    def delete(self, session: Session, model: Type[Base], filters: tuple) -> None:
+        row = session.query(model).filter(*filters).one()
+        session.delete(row)
 
     def close(self) -> None:
-        self._session.close()
         self._connection.close()

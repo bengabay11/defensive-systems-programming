@@ -52,6 +52,12 @@ struct CRCRequest
 };
 
 #pragma pack(1)
+struct CRCResponse
+{
+	char clientId[Consts::CLIENT_ID_SIZE];
+};
+
+#pragma pack(1)
 struct RegisterResponse
 {
 	char clientId[Consts::CLIENT_ID_SIZE];

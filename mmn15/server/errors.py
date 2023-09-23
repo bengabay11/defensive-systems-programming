@@ -48,6 +48,20 @@ class UnauthorizedClientError(BaseServerError):
         super().__init__(message)
 
 
+class ClientNotFoundError(BaseServerError):
+    def __init__(self, client_id: UUID) -> None:
+        self.client_id = client_id
+        message = f"Client with id - '{client_id}' not found in the DB"
+        super().__init__(message)    
+
+
+class FileAlreadyExistsError(BaseServerError):
+    def __init__(self, client_id: UUID, filename: str) -> None:
+        self.client_id = client_id
+        message = f"file - '{filename} already exists for client with id - '{client_id}'"
+        super().__init__(message)    
+
+
 class UnsupportedRequestCodeException(BaseServerError):
     def __init__(self, request_code: int) -> None:
         self._request_code = request_code

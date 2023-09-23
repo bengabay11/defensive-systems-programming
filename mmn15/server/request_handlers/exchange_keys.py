@@ -33,6 +33,7 @@ class ExchangeKeysRequestHandler(BaseRequestHandler):
             aes_key = cipher.generate_aes_key()
             encrypted_aes_key = cipher.encrypt_aes_key(aes_key, public_key)
             server_db.clients.update_client_public_key(client_name, public_key)
+            server_db.clients.update_client_aes_key(client_id, aes_key)
             return encrypted_aes_key
         else:
             raise ClientNotFoundError(client_id)

@@ -130,6 +130,10 @@ RegisterResponse Client::registerClient(char clientName[Consts::CLIENT_NAME_SIZE
 		std::cerr << "Registration faield, Client with the same name already exists." << std::endl;
 		exit(1);
 	}
+	else if (responseHeader.code == Consts::ResponseCodes::GENERAL_SERVER_ERROR) {
+		std::cerr << "Registration faield, general server error." << std::endl;
+		exit(1);
+	}
 
 }
 
@@ -203,20 +207,21 @@ void Client::uploadFileWithRetries(char clientId[Consts::CLIENT_ID_SIZE], std::s
 	std::string x = filePathObject.filename().string();
 	memcpy(filename, filePathObject.filename().string().c_str(), x.size());
 	int retry;
-	for (retry = 1; retry <= maxRetries; retry++) {
-		std::cout << "Uploading file to server: " << filePath << std::endl;
+	for (retry = 0; retry < maxRetries; retry++) {
+		std::cout << "[Try #" << retry + 1 << "] Uploading file to server: " << filePath << std::endl;
 		bool fileUploaded = this->uploadFile(clientId, filePath, filename);
 		if (fileUploaded) {
-			std::cout << "File uploaded successfully" << std::endl;
+			std::cout << "Received Valid CRC. Sending Valid CRC Request" << std::endl;
 			this->sendValidCRC(clientId, filename);
 			break;
 		}
-		std::cout << "File upload failed." << std::endl;
+		std::cout << "Received Invalid CRC, upload failed. Sending Invalid CRC Request" << std::endl;
 		this->sendInvalidCRC(clientId, filename);
 
 	}
 	if (retry == maxRetries) {
-		this->sendInvalidCRC(clientId, filename);
+		std::cout << "Exceeded max retries, upload failed. Sending Invalid CRC Abort Request" << std::endl;
+		this->sendInvalidCRCAbort(clientId, filename);
 	}
 }
 
@@ -274,14 +279,15 @@ bool Client::uploadFile(char clientId[Consts::CLIENT_ID_SIZE], std::string fileP
 	this->sendRequest(clientId, Consts::RequestCodes::FILE_UPLOAD, fileUploadRequestBuffer, sizeof(fileUploadRequest));
 	this->clientSocket->sendData(encryptedFileContent.data(), fileUploadRequest.contentSize);
 	ResponseHeader responseHeader = this->receiveResponseHeader();
-	FileUploadResponse fileUploadResponse{};
-	char* fileUploadResponseBuffer = reinterpret_cast<char*>(&fileUploadResponse);
-	this->clientSocket->receive(fileUploadResponseBuffer, responseHeader.payloadSize);
 	if (responseHeader.code == Consts::ResponseCodes::FILE_RECEIVED) {
+		FileUploadResponse fileUploadResponse{};
+		char* fileUploadResponseBuffer = reinterpret_cast<char*>(&fileUploadResponse);
+		this->clientSocket->receive(fileUploadResponseBuffer, responseHeader.payloadSize);
 		return checksum == fileUploadResponse.checksum;
 	}
-	else {
-		return false;
+	else if (responseHeader.code == Consts::ResponseCodes::GENERAL_SERVER_ERROR)  {
+		std::cerr << "General server Error while uploading file - " << filename << " to server" << std::endl;
+		exit(1);
 	}
 }
 
@@ -301,6 +307,17 @@ void Client::sendCRCRequest(Consts::RequestCodes requestCode, char clientId[Cons
 	memcpy(crcRequest.filename, filename, Consts::FILE_NAME_SIZE);
 	char* crcRequestBuffer = reinterpret_cast<char*>(&crcRequest);
 	this->sendRequest(clientId, requestCode, crcRequestBuffer, sizeof(crcRequest));
+	ResponseHeader responseHeader = this->receiveResponseHeader();
+	if (responseHeader.code == Consts::ResponseCodes::MESSAGE_ACCEPTED) {
+		CRCResponse crcResponse {};
+		char* fileUploadResponseBuffer = reinterpret_cast<char*>(&crcResponse);
+		this->clientSocket->receive(fileUploadResponseBuffer, sizeof(crcResponse));
+		std::cout << "Received CRC Response" << std::endl;
+	}
+	else if (responseHeader.code == Consts::ResponseCodes::GENERAL_SERVER_ERROR) {
+		std::cerr << "General server Error while Sending CRC Request. Request code - " << requestCode  << std::endl;
+		exit(1);
+	}
 }
 
 void Client::sendInvalidCRC(char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE])
