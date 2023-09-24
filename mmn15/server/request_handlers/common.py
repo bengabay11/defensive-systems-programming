@@ -1,5 +1,6 @@
 
 
+import datetime
 from logging import debug
 import os
 from uuid import UUID
@@ -22,6 +23,7 @@ def delete_file(client_id: UUID, filename: str, server_db: ServerDB) -> None:
 def authenticate_client(client_id: UUID, server_db: ServerDB):
     client = server_db.clients.get_client_by_id(client_id)
     if client:
+        server_db.clients.update_last_seen(client_id, datetime.datetime.now())
         return client
     else:
         raise ClientNotFoundError(client_id)

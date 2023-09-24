@@ -6,11 +6,11 @@
 
 #include "Consts.h"
 
-class GeneralServerErrorException:
+class SendRequestMaxRetriesException:
     public std::runtime_error
 {
 public:
-    GeneralServerErrorException();
+    SendRequestMaxRetriesException();
 };
 
 class UnkownResponseCodeException:
@@ -45,4 +45,45 @@ private:
     std::string filePath;
 public:
     OpenFileFailException(std::string filePath);
+};
+
+class ConnectServerException :
+    public std::runtime_error
+{
+private:
+    std::string host;
+    int port;
+    static std::string generateErrorMessage(const std::string& host, int port);
+public:
+    ConnectServerException(std::string host, int port);
+};
+
+class SocketSendException:
+    public std::runtime_error
+{
+public:
+    SocketSendException();
+};
+
+class SocketRecvException :
+    public std::runtime_error
+{
+public:
+    SocketRecvException();
+};
+
+class InitWinsockException:
+    public std::runtime_error
+{
+public:
+    InitWinsockException();
+};
+
+class CreateSocketException:
+    public std::runtime_error
+{
+private:
+    int WSALastError;
+public:
+    CreateSocketException(int WSALastError);
 };

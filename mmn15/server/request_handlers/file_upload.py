@@ -14,7 +14,9 @@ import config
 from dal.models.file import File
 from crc import CRC32
 from errors import FileAlreadyExistsError
-from request_handlers.common import authenticate_client
+from request_handlers.common import authenticate_client, delete_file
+import protocol
+from dal.models.client import Client
 
 
 METADATA_FORMAT = "<L255s"
@@ -28,21 +30,23 @@ class FileUploadRequestHandler(BaseRequestHandler):
         content_size, filename_bytes = struct.unpack(METADATA_FORMAT, payload_metadata)
         filename = filename_bytes.decode().rstrip("\x00")
         client_id = UUID(bytes=request_header.client_id)
+        client = authenticate_client(client_id, server_db)
         base_folder = os.path.join(config.UPLOADED_FILES_DIRECTORY, str(uuid.uuid4()))
-        try:
+        file = server_db.files.get_file(client_id, filename)
+        if not file:
+            protocol.send_response(client_socket, ResponseCodes.MESSAGE_ACCEPTED.value, b'')
             content_crc, decrypted_content = FileUploadRequestHandler.upload_file(
                 client_socket,
+                client,
                 base_folder,
-                client_id,
                 filename,
                 content_size,
                 server_db
             )
             payload = struct.pack("<16sL255sL", client_id.bytes, len(decrypted_content), filename.encode(), content_crc)
             return ResponseCodes.VALID_FILE_ACCEPTED, payload
-        except Exception as e:
-            FileUploadRequestHandler.rollback_upload_file(base_folder, client_id, filename, server_db)
-            raise e
+        else:
+            raise FileAlreadyExistsError(client_id, filename)
 
     @staticmethod
     def receive_file_content(client_socket: socket, content_size: int):
@@ -55,24 +59,12 @@ class FileUploadRequestHandler(BaseRequestHandler):
         return encrypted_content
 
     @staticmethod
-    def upload_file(client_socket: socket, base_folder: str, client_id: UUID, filename: str, content_size: int, server_db: ServerDB):
+    def upload_file(client_socket: socket, client: Client, base_folder: str, filename: str,content_size: int, server_db: ServerDB):
         encrypted_content = FileUploadRequestHandler.receive_file_content(client_socket, content_size)
-        file = server_db.files.get_file(client_id, filename)
-        if not file:
-            client = authenticate_client(client_id, server_db)
-            decrypted_content = cipher.decrypt_bytes(client.aes_key, encrypted_content)
-            FileUploadRequestHandler.save_file(base_folder, decrypted_content, client_id, filename, server_db)
-            content_crc = FileUploadRequestHandler.calculate_crc(decrypted_content)
-            return content_crc, decrypted_content
-        else:
-            raise FileAlreadyExistsError(client_id, filename)
-
-    @staticmethod
-    def rollback_upload_file(base_folder, client_id: UUID, filename: str, server_db: ServerDB):
-        if os.path.isdir(base_folder):
-            error(f"Upload file failed. removing folder - '{base_folder}'")
-            os.rmdir(base_folder)
-
+        decrypted_content = cipher.decrypt_bytes(client.aes_key, encrypted_content)
+        FileUploadRequestHandler.save_file(base_folder, decrypted_content, client.id, filename, server_db)
+        content_crc = FileUploadRequestHandler.calculate_crc(decrypted_content)
+        return content_crc, decrypted_content
 
     @staticmethod
     def save_file(base_folder: str, file_content: bytes, client_id: UUID, filename: str, server_db: ServerDB):

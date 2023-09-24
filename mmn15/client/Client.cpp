@@ -23,6 +23,7 @@ ClientHolder Client::initialize(char fallbackClientName[Consts::CLIENT_NAME_SIZE
 	if (loginFile.is_open()) {
 		std::cout << "Parsing login file" << std::endl;
 		ClientLoginData clientLoginData = this->parseLoginFile();
+		std::cout << "Logging in client - " << clientLoginData.clientName << std::endl;
 		LoginResponse loginResponse = this->login(clientLoginData.clientId, clientLoginData.clientName);
 		this->rsaPrivateWrapper.setPrivateKey(clientLoginData.privateRSAKey);
 		std::string aesKey = this->rsaPrivateWrapper.decrypt(loginResponse.encryptedAESKey, Consts::ENCRYPTED_AES_KEY_SIZE);
@@ -44,8 +45,12 @@ ClientHolder Client::initialize(char fallbackClientName[Consts::CLIENT_NAME_SIZE
 	return clientHolder;
 }
 
-void Client::sendRequest(char clientId[Consts::CLIENT_ID_SIZE], short requestCode, char* payloadBuffer, long payloadSize)
-{
+void Client::sendRequest(
+	char clientId[Consts::CLIENT_ID_SIZE],
+	short requestCode, 
+	char* payloadBuffer,
+	long payloadSize
+){
 	RequesttHeader requestHeader{};
 	memcpy(requestHeader.client_id, clientId, Consts::CLIENT_ID_SIZE);
 	requestHeader.version = Consts::CLIENT_VERSION;
@@ -53,8 +58,27 @@ void Client::sendRequest(char clientId[Consts::CLIENT_ID_SIZE], short requestCod
 	requestHeader.payload_size = payloadSize;
 	char* requestHeaderBuffer = reinterpret_cast<char*>(&requestHeader);
 	this->clientSocket->sendData(requestHeaderBuffer, sizeof(requestHeader));
-
 	this->clientSocket->sendData(payloadBuffer, payloadSize);
+}
+
+
+
+ResponseHeader Client::requestResponseWorkflow(char clientId[Consts::CLIENT_ID_SIZE], short requestCode, char* payloadBuffer, long payloadSize, int maxRetries)
+{
+	int retry;
+	for (retry = 0; retry < maxRetries; retry++) {
+		this->sendRequest(clientId, requestCode, payloadBuffer, payloadSize);
+		ResponseHeader responseHeader = this->receiveResponseHeader();
+		if (responseHeader.code == Consts::ResponseCodes::GENERAL_SERVER_ERROR) {
+			std::cerr << "Server responded with an error" << std::endl;
+		}
+		else {
+			return responseHeader;
+		}
+	}
+	if (retry == maxRetries) {
+		throw SendRequestMaxRetriesException();
+	}
 }
 
 ResponseHeader Client::receiveResponseHeader()
@@ -116,8 +140,7 @@ RegisterResponse Client::registerClient(char clientName[Consts::CLIENT_NAME_SIZE
 	char* registerRequestBuffer = reinterpret_cast<char*>(&registerRequest);
 	char clientId[Consts::CLIENT_ID_SIZE];
 	ZeroMemory(clientId, Consts::CLIENT_ID_SIZE);
-	this->sendRequest(clientId, Consts::RequestCodes::REGISTER, registerRequestBuffer, sizeof(registerRequest));
-	ResponseHeader responseHeader = this->receiveResponseHeader();
+	ResponseHeader responseHeader = this->requestResponseWorkflow(clientId, Consts::RequestCodes::REGISTER, registerRequestBuffer, sizeof(registerRequest));
 	if (responseHeader.code == Consts::ResponseCodes::REGISTRATION_SUCCESS) {
 		RegisterResponse registerResponse{};
 		char* registerResponseBuffer = reinterpret_cast<char*>(&registerResponse);
@@ -128,7 +151,7 @@ RegisterResponse Client::registerClient(char clientName[Consts::CLIENT_NAME_SIZE
 		throw RegistrationFailedException(clientName);
 	}
 	else {
-		this->handleResponseError(responseHeader);
+		throw UnkownResponseCodeException(responseHeader.code);
 	}
 }
 
@@ -137,8 +160,7 @@ LoginResponse Client::login(char clientId[Consts::CLIENT_ID_SIZE], char clientNa
 	RegisterRequest registerRequest{};
 	memcpy(registerRequest.name, clientName, Consts::CLIENT_NAME_SIZE);
 	char* registerRequestBuffer = reinterpret_cast<char*>(&registerRequest);
-	this->sendRequest(clientId, Consts::RequestCodes::RETRY_CONNECTION, registerRequestBuffer, sizeof(registerRequest));
-	ResponseHeader responseHeader = this->receiveResponseHeader();
+	ResponseHeader responseHeader = this->requestResponseWorkflow(clientId, Consts::RequestCodes::RETRY_CONNECTION, registerRequestBuffer, sizeof(registerRequest));
 	if (responseHeader.code == Consts::ResponseCodes::LOGIN_OKAY) {
 		std::cout << "Login accepted" << std::endl;
 		LoginResponse loginResponse{};
@@ -150,11 +172,11 @@ LoginResponse Client::login(char clientId[Consts::CLIENT_ID_SIZE], char clientNa
 		throw LoginDeclinedException();
 	}
 	else {
-		this->handleResponseError(responseHeader);
+		throw UnkownResponseCodeException(responseHeader.code);
 	}
 }
 
-void Client::sendPublicKey(
+ResponseHeader Client::sendPublicKey(
 	char clientId [Consts::CLIENT_ID_SIZE],
 	char clientName[Consts::CLIENT_NAME_SIZE],
 	char publicKeyBuffer[RSAPublicWrapper::KEYSIZE]) {
@@ -162,21 +184,22 @@ void Client::sendPublicKey(
 	memcpy(exchangeKeysRequest.name, clientName, Consts::CLIENT_NAME_SIZE);
 	memcpy(exchangeKeysRequest.rsaPublicKey, publicKeyBuffer, RSAPublicWrapper::KEYSIZE);
 	char* exchangeKeysRequestBuffer = reinterpret_cast<char*>(&exchangeKeysRequest);
-	this->sendRequest(clientId, Consts::RequestCodes::EXCHANGE_KEYS, exchangeKeysRequestBuffer, sizeof(exchangeKeysRequest));
+	ResponseHeader responseHeader = this->requestResponseWorkflow(clientId, Consts::RequestCodes::EXCHANGE_KEYS, exchangeKeysRequestBuffer, sizeof(exchangeKeysRequest));
+	if (responseHeader.code == Consts::ResponseCodes::PUBLIC_KEY_ACCEPTED) {
+		return responseHeader;
+	}
+	else {
+		throw UnkownResponseCodeException(responseHeader.code);
+	}
+
 }
 
 ExchangeKeysResponse Client::receiveAESKey(char clientName[Consts::CLIENT_NAME_SIZE]) {
-	ResponseHeader responseHeader = this->receiveResponseHeader();
-	if (responseHeader.code == Consts::ResponseCodes::PUBLIC_KEY_ACCEPTED) {
-		ExchangeKeysResponse exchangeKeysResponse{};
-		char* exchangeKeysResponseBuffer = reinterpret_cast<char*>(&exchangeKeysResponse);
-		this->clientSocket->receive(exchangeKeysResponseBuffer, sizeof(exchangeKeysResponse));
-		std::cout << "Server accepted public key" << std::endl;
-		return exchangeKeysResponse;
-	}
-	else {
-		this->handleResponseError(responseHeader);
-	}
+	ExchangeKeysResponse exchangeKeysResponse{};
+	char* exchangeKeysResponseBuffer = reinterpret_cast<char*>(&exchangeKeysResponse);
+	this->clientSocket->receive(exchangeKeysResponseBuffer, sizeof(exchangeKeysResponse));
+	std::cout << "Server accepted public key" << std::endl;
+	return exchangeKeysResponse;
 }
 
 std::string Client::exchangeKeys(char clientId[Consts::CLIENT_ID_SIZE], char clientName[Consts::CLIENT_NAME_SIZE])
@@ -185,7 +208,7 @@ std::string Client::exchangeKeys(char clientId[Consts::CLIENT_ID_SIZE], char cli
 	this->rsaPrivateWrapper.getPublicKey(publicKeyBuffer, RSAPublicWrapper::KEYSIZE);
 	std::string privateKey = this->rsaPrivateWrapper.getPrivateKey();
 
-	this->sendPublicKey(clientId, clientName, publicKeyBuffer);
+	ResponseHeader responseHeader = this->sendPublicKey(clientId, clientName, publicKeyBuffer);
 	ExchangeKeysResponse exchangeKeysResponse = this->receiveAESKey(clientName);
 	this->dumpLoginInfo(clientId, clientName);
 	return this->rsaPrivateWrapper.decrypt(exchangeKeysResponse.aesKey, Consts::ENCRYPTED_AES_KEY_SIZE);
@@ -266,17 +289,27 @@ bool Client::uploadFile(char clientId[Consts::CLIENT_ID_SIZE], std::string fileP
 	fileUploadRequest.contentSize = (long)encryptedFileContent.length();
 	memcpy(fileUploadRequest.fileName, filename, Consts::FILE_NAME_SIZE);
 	char* fileUploadRequestBuffer = reinterpret_cast<char*>(&fileUploadRequest);
-	this->sendRequest(clientId, Consts::RequestCodes::FILE_UPLOAD, fileUploadRequestBuffer, sizeof(fileUploadRequest));
-	this->clientSocket->sendData(encryptedFileContent.data(), fileUploadRequest.contentSize);
-	ResponseHeader responseHeader = this->receiveResponseHeader();
-	if (responseHeader.code == Consts::ResponseCodes::FILE_RECEIVED) {
-		FileUploadResponse fileUploadResponse{};
-		char* fileUploadResponseBuffer = reinterpret_cast<char*>(&fileUploadResponse);
-		this->clientSocket->receive(fileUploadResponseBuffer, sizeof(fileUploadResponse));
-		return checksum == fileUploadResponse.checksum;
+	ResponseHeader responseHeader = this->requestResponseWorkflow(
+		clientId,
+		Consts::RequestCodes::FILE_UPLOAD,
+		fileUploadRequestBuffer,
+		sizeof(fileUploadRequest)
+	);
+	if (responseHeader.code == Consts::ResponseCodes::MESSAGE_ACCEPTED) {
+		this->clientSocket->sendData(encryptedFileContent.data(), fileUploadRequest.contentSize);
+		ResponseHeader responseHeader = this->receiveResponseHeader();
+		if (responseHeader.code == Consts::ResponseCodes::FILE_RECEIVED) {
+			FileUploadResponse fileUploadResponse{};
+			char* fileUploadResponseBuffer = reinterpret_cast<char*>(&fileUploadResponse);
+			this->clientSocket->receive(fileUploadResponseBuffer, sizeof(fileUploadResponse));
+			return checksum == fileUploadResponse.checksum;
+		}
+		else {
+			throw UnkownResponseCodeException(responseHeader.code);
+		}
 	}
 	else {
-		this->handleResponseError(responseHeader);
+		throw UnkownResponseCodeException(responseHeader.code);
 	}
 }
 
@@ -295,8 +328,7 @@ void Client::sendCRCRequest(Consts::RequestCodes requestCode, char clientId[Cons
 	CRCRequest crcRequest{};
 	memcpy(crcRequest.filename, filename, Consts::FILE_NAME_SIZE);
 	char* crcRequestBuffer = reinterpret_cast<char*>(&crcRequest);
-	this->sendRequest(clientId, requestCode, crcRequestBuffer, sizeof(crcRequest));
-	ResponseHeader responseHeader = this->receiveResponseHeader();
+	ResponseHeader responseHeader = this->requestResponseWorkflow(clientId, requestCode, crcRequestBuffer, sizeof(crcRequest));
 	if (responseHeader.code == Consts::ResponseCodes::MESSAGE_ACCEPTED) {
 		CRCResponse crcResponse {};
 		char* fileUploadResponseBuffer = reinterpret_cast<char*>(&crcResponse);
@@ -304,7 +336,7 @@ void Client::sendCRCRequest(Consts::RequestCodes requestCode, char clientId[Cons
 		std::cout << "Received CRC Response" << std::endl;
 	}
 	else {
-		this->handleResponseError(responseHeader);
+		throw UnkownResponseCodeException(responseHeader.code);
 	}
 }
 
@@ -323,12 +355,3 @@ void Client::sendValidCRC(char clientId[Consts::CLIENT_ID_SIZE], char filename[C
 	this->sendCRCRequest(Consts::RequestCodes::VALID_CRC, clientId, filename);
 }
 
-void Client::handleResponseError(ResponseHeader responseHeader)
-{
-	if (responseHeader.code == Consts::ResponseCodes::GENERAL_SERVER_ERROR) {
-		throw GeneralServerErrorException();
-	}
-	else {
-		throw UnkownResponseCodeException(responseHeader.code);
-	}
-}

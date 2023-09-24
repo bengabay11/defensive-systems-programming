@@ -1,8 +1,10 @@
 from functools import wraps
+from logging import info
 from typing import Type, Any
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy_utils import database_exists, create_database
 
 from dal.models.base import Base
 
@@ -33,6 +35,10 @@ class DBConnection(object):
     def connect(self, protocol: str, database: str) -> None:
         url = f"{protocol}:///{database}"
         engine = create_engine(url)
+        if not database_exists(engine.url):
+            info(f"Database not exist at - '{url}'. Creating a new one")
+            create_database(url)
+            Base.metadata.create_all(engine)
         self.session_maker = sessionmaker(bind=engine)
         self._connection = engine.connect()
 

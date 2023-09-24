@@ -4,15 +4,14 @@ ClientSocket::ClientSocket()
 {
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        std::cerr << "Failed to initialize winsock";
-        return;
+        throw InitWinsockException();
     }
 
     this->socketObject = socket(AF_INET, SOCK_STREAM, 0);
     if (this->socketObject == INVALID_SOCKET) {
-        std::cerr << "Failed to create socket: " << WSAGetLastError();
         WSACleanup();
-        return;
+        int wsaLastError = WSAGetLastError();
+        throw CreateSocketException(wsaLastError);
     }
 }
 
@@ -25,16 +24,17 @@ void ClientSocket::connectToServer(std::string host, int port)
 
     int iResult = connect(this->socketObject, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
     if (iResult < 0) {
-        std::cerr << "Failed to connect to the server";
+   
         this->close();
+        throw ConnectServerException(host, port);
     }
 }
 
 void ClientSocket::sendData(char* buffer, long bufferSize)
 {
     if (send(this->socketObject, buffer, bufferSize, 0) < 0) {
-        std::cerr << "Failed to send data to the server";
         this->close();
+        throw SocketSendException();
     }
 }
 
@@ -42,8 +42,8 @@ void ClientSocket::receive(char* buffer, long bufferSize)
 {
     int bytesRead = recv(this->socketObject, buffer, bufferSize, 0);
     if (bytesRead < 0) {
-        std::cerr << "Failed to receive data from the server";
         this->close();
+        throw SocketRecvException();
     }
 }
 
@@ -51,5 +51,4 @@ void ClientSocket::close()
 {
     closesocket(this->socketObject);
     WSACleanup();
-    exit(1);
 }

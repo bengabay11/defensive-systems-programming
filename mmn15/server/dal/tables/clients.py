@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from uuid import UUID
 from dal.db_connection import DBConnection
@@ -38,3 +39,7 @@ class ClientsTable(object):
     def update_client_aes_key(self, client_id: UUID, aes_key: bytes) -> None:
         filters = (Client.id == client_id,)
         self._db_connection.update(Client, filters, "aes_key", aes_key)
+
+    def update_last_seen(self, client_id: UUID, last_seen: datetime) -> None:
+        filters = (Client.id == client_id,)
+        self._db_connection.update(Client, filters, "last_seen", last_seen)
