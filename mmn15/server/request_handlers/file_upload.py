@@ -34,7 +34,6 @@ class FileUploadRequestHandler(BaseRequestHandler):
         base_folder = os.path.join(config.UPLOADED_FILES_DIRECTORY, str(uuid.uuid4()))
         file = server_db.files.get_file(client_id, filename)
         if not file:
-            protocol.send_response(client_socket, ResponseCodes.MESSAGE_ACCEPTED.value, b'')
             content_crc, decrypted_content = FileUploadRequestHandler.upload_file(
                 client_socket,
                 client,

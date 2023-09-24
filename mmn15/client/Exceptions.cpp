@@ -11,7 +11,7 @@ LoginDeclinedException::LoginDeclinedException(): runtime_error("Server declined
 RegistrationFailedException::RegistrationFailedException(std::string clientName):
 	runtime_error("Registration faield, Client with the same name already exists - " + clientName), clientName(clientName) {}
 
-OpenFileFailException::OpenFileFailException(std::string filePath) : runtime_error("Couldn't open file - " + filePath), filePath(filePath) {}
+OpenFileException::OpenFileException(std::string filePath) : runtime_error("Couldn't open file - " + filePath), filePath(filePath) {}
 
 std::string ConnectServerException::generateErrorMessage(const std::string& host, int port)
 {

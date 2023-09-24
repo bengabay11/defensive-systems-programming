@@ -38,13 +38,13 @@ public:
     RegistrationFailedException(std::string clientName);
 };
 
-class OpenFileFailException:
+class OpenFileException:
     public std::runtime_error
 {
 private:
     std::string filePath;
 public:
-    OpenFileFailException(std::string filePath);
+    OpenFileException(std::string filePath);
 };
 
 class ConnectServerException :
