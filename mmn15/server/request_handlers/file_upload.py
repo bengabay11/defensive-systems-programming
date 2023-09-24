@@ -1,4 +1,4 @@
-from logging import debug, error
+from logging import debug
 import os
 from socket import socket
 import struct
@@ -15,7 +15,6 @@ from dal.models.file import File
 from crc import CRC32
 from errors import FileAlreadyExistsError
 from request_handlers.common import authenticate_client, delete_file
-import protocol
 from dal.models.client import Client
 
 
