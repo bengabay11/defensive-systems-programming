@@ -67,5 +67,6 @@ private:
 	bool uploadFile(char clientId[Consts::CLIENT_ID_SIZE], std::string filePath, char filename[Consts::FILE_NAME_SIZE]);
 public:
 	Client();
+	~Client();
 	void run();
 };

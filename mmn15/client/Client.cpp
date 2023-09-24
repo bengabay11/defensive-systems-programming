@@ -5,6 +5,11 @@ Client::Client()
 	this->clientSocket = new ClientSocket();
 }
 
+Client::~Client()
+{
+	delete this->clientSocket;
+}
+
 void Client::run()
 {
 	std::cout << "Parsing trasfer file" << std::endl;
@@ -305,15 +310,15 @@ bool Client::uploadFile(char clientId[Consts::CLIENT_ID_SIZE], std::string fileP
 		std::streampos fileSize = file.tellg();
 		file.seekg(0, std::ios::beg);
 
-		char* buffer = new char[fileSize];
-		file.read(buffer, fileSize);
+		char* fileContentBuffer = new char[fileSize];
+		file.read(fileContentBuffer, fileSize);
 
 		// Calculate CRC
 		CRC crc;
-		crc.update((u_char*)buffer, (uint32_t)fileSize);
+		crc.update((u_char*)fileContentBuffer, (uint32_t)fileSize);
 		auto checksum = crc.digest();
 
-		auto encryptedFileContent = this->aesWrapper.encrypt(buffer, (unsigned int)fileSize);
+		auto encryptedFileContent = this->aesWrapper.encrypt(fileContentBuffer, (unsigned int)fileSize);
 
 		// Send upload request to server
 		int retry;
@@ -324,16 +329,19 @@ bool Client::uploadFile(char clientId[Consts::CLIENT_ID_SIZE], std::string fileP
 				FileUploadResponse fileUploadResponse{};
 				char* fileUploadResponseBuffer = reinterpret_cast<char*>(&fileUploadResponse);
 				this->clientSocket->receive(fileUploadResponseBuffer, sizeof(fileUploadResponse));
+				delete[] fileContentBuffer;
 				return checksum == fileUploadResponse.checksum;
 			}
 			else if (responseHeader.code == Consts::ResponseCodes::GENERAL_SERVER_ERROR) {
 				std::cerr << "Server responded with an error" << std::endl;
 			}
 			else {
+				delete[] fileContentBuffer;
 				throw UnkownResponseCodeException(responseHeader.code);
 			}
 		}
 		if (retry == Consts::SEND_REQUEST_MAX_RETRIES) {
+			delete[] fileContentBuffer;
 			throw SendRequestMaxRetriesException();
 		}
 	}
