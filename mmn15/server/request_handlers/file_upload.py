@@ -1,4 +1,4 @@
-from logging import debug
+from logging import debug, info
 import os
 from socket import socket
 import struct
@@ -58,10 +58,12 @@ class FileUploadRequestHandler(BaseRequestHandler):
 
     @staticmethod
     def upload_file(client_socket: socket, client: Client, base_folder: str, filename: str,content_size: int, server_db: ServerDB):
+        info(f"Uploading file '{filename} for client '{client.name} to the server'")
         encrypted_content = FileUploadRequestHandler.receive_file_content(client_socket, content_size)
         decrypted_content = cipher.decrypt_bytes(client.aes_key, encrypted_content)
         FileUploadRequestHandler.save_file(base_folder, decrypted_content, client.id, filename, server_db)
         content_crc = FileUploadRequestHandler.calculate_crc(decrypted_content)
+        info(f"CRC for file '{filename}' - {content_crc}")
         return content_crc, decrypted_content
 
     @staticmethod

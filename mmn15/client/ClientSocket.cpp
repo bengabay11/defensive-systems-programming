@@ -17,6 +17,7 @@ ClientSocket::ClientSocket()
 
 void ClientSocket::connectToServer(std::string host, int port)
 {
+    std::cout << "Connecting to server at: " << host << ":" << port << std::endl;
     sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_port = htons(port);

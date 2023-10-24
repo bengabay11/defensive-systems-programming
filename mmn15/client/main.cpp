@@ -1,17 +1,17 @@
 #include <iostream>
-#include "Client.h"
+#include "Workflow.h"
 
 int main()
 {
     try {
-        std::cout << "Starting client" << std::endl;
-        Client* client = new Client();
-        client->run();
-        delete client;
+        Workflow* workflow = new Workflow();
+        std::cout << "Starting workflow" << std::endl;
+        workflow->run();
+        delete workflow;
     }
     catch (const std::exception& e)
     {
-        std::cerr << "Error while running client: " << e.what() << std::endl;
+        std::cerr << "Error while running workflow: " << e.what() << std::endl;
         exit(1);
     }
 }

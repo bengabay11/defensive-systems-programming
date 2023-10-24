@@ -151,22 +151,26 @@
     <ClCompile Include="AESWrapper.cpp" />
     <ClCompile Include="Base64Wrapper.cpp" />
     <ClCompile Include="Client.cpp" />
-    <ClCompile Include="ClientCRC.cpp" />
+    <ClCompile Include="CRC.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
     <ClCompile Include="Exceptions.cpp" />
+    <ClCompile Include="FileParser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RSAWrapper.cpp" />
+    <ClCompile Include="Workflow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AESWrapper.h" />
     <ClInclude Include="Base64Wrapper.h" />
     <ClInclude Include="Client.h" />
-    <ClInclude Include="ClientCRC.h" />
+    <ClInclude Include="CRC.h" />
     <ClInclude Include="ClientSocket.h" />
     <ClInclude Include="Consts.h" />
     <ClInclude Include="Exceptions.h" />
+    <ClInclude Include="FileParser.h" />
     <ClInclude Include="RSAWrapper.h" />
     <ClInclude Include="Structs.h" />
+    <ClInclude Include="Workflow.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="client.rc" />

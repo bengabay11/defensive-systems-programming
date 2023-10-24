@@ -1,4 +1,4 @@
-#include "ClientCRC.h"
+#include "CRC.h"
 
 static uint32_t const crctab[256] = {
 	0x00000000,	0x04C11DB7,	0x09823B6E,	0x0D4326D9,	0x130476DC,
@@ -84,4 +84,3 @@ uint32_t CRC::digest() {
 	}
 	return ~crc_local;
 }
-

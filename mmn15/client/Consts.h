@@ -1,6 +1,4 @@
-
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#pragma once
 
 #include "RSAWrapper.h"
 
@@ -48,4 +46,3 @@ namespace Consts
 
 	const size_t BUFFER_SIZE = 2048;
 }
-#endif
