@@ -205,7 +205,7 @@ void Client::uploadFileWithRetries(char clientId[Consts::CLIENT_ID_SIZE], std::s
 	memcpy(filename, filenameString.c_str(), filenameString.size());
 	int retry;
 	for (retry = 0; retry < maxRetries; retry++) {
-		std::cout << "[Try #" << retry + 1 << "]";
+		std::cout << "[Try #" << retry + 1 << "] ";
 		bool fileUploaded = this->uploadFile(clientId, filePath, filename);
 		if (fileUploaded) {
 			std::cout << "Received Valid CRC. Sending Valid CRC Request" << std::endl;

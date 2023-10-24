@@ -10,16 +10,14 @@ from request_handlers.common import authenticate_client
 
 
 class LoginRequestHandler(BaseRequestHandler):
-    @staticmethod
-    def handle(client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> (ResponseCodes, bytes):
+    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> (ResponseCodes, bytes):
         payload = client_socket.recv(request_header.payload_size)
         client_name = payload.decode().rstrip("\x00")
         client_id = uuid.UUID(bytes=request_header.client_id)
-        encrypted_aes_key = LoginRequestHandler.login_client(client_id, client_name, server_db)
+        encrypted_aes_key = self.login_client(client_id, client_name, server_db)
         return ResponseCodes.LOGIN_SUCCESS, client_id.bytes + encrypted_aes_key
     
-    @staticmethod
-    def login_client(client_id: uuid.UUID, client_name: str, server_db: ServerDB) -> bytes:
+    def login_client(self, client_id: uuid.UUID, client_name: str, server_db: ServerDB) -> bytes:
         client = authenticate_client(client_id, server_db)
         if client.name != client_name:
             raise LoginFailError(client_id, client_name)

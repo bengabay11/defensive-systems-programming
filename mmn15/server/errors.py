@@ -4,9 +4,8 @@ from uuid import UUID
 from protocol import ResponseCodes
 
 class BaseServerError(Exception, abc.ABC):
-    @staticmethod
     @abc.abstractmethod
-    def error_code() -> int:
+    def error_code(self) -> int:
         return ResponseCodes.GENERAL_SERVER_ERROR
 
 
@@ -16,8 +15,7 @@ class RegistrationFailError(BaseServerError):
         message = f"Registration failed, client with name '{self.client_name}' already registered."
         super().__init__(message)
 
-    @staticmethod
-    def error_code() -> int:
+    def error_code(self) -> int:
         return ResponseCodes.REGISTRATION_FAIL
     
 
@@ -28,8 +26,7 @@ class LoginFailError(BaseServerError):
         message = f"ID - '{client_id}' and name - '{client_name}' does not match"
         super().__init__(message)
 
-    @staticmethod
-    def error_code() -> int:
+    def error_code(self) -> int:
         return ResponseCodes.LOGIN_FAIL
 
         

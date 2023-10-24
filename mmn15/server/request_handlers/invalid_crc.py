@@ -4,14 +4,11 @@ from request_handlers.base import BaseRequestHandler
 from dal.server_db import ServerDB
 from protocol import ResponseCodes
 from protocol import RequestHeader
-from request_handlers.common import delete_file
+from request_handlers.common import authenticate_client, delete_file
 
 
 class InvalidCRCRequestHandler(BaseRequestHandler):
-    @staticmethod
-    def handle(client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> (ResponseCodes, bytes):
-        payload = client_socket.recv(request_header.payload_size)
-        filename = payload.decode().rstrip("\x00")
+    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> (ResponseCodes, bytes):
         client_id = UUID(bytes=request_header.client_id)
-        delete_file(client_id, filename, server_db)
+        authenticate_client(client_id, server_db)
         return ResponseCodes.MESSAGE_ACCEPTED, client_id.bytes

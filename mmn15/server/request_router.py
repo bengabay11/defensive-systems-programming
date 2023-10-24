@@ -14,13 +14,13 @@ from protocol import ResponseCodes
 from request_handlers.login import LoginRequestHandler
 
 REQUEST_HANDLERS = {
-    RequestTypes.REGISTER: RegisterRequestHandler,
-    RequestTypes.EXCHANGE_KEYS: ExchangeKeysRequestHandler,
-    RequestTypes.LOGIN: LoginRequestHandler,
-    RequestTypes.FILE_UPLOAD: FileUploadRequestHandler,
-    RequestTypes.VALID_CRC: ValidCRCRequestHandler,
-    RequestTypes.INVALID_CRC: InvalidCRCRequestHandler,
-    RequestTypes.INVALID_CRC_ABORT: InvalidCRCAbortRequestHandler
+    RequestTypes.REGISTER: RegisterRequestHandler(),
+    RequestTypes.EXCHANGE_KEYS: ExchangeKeysRequestHandler(),
+    RequestTypes.LOGIN: LoginRequestHandler(),
+    RequestTypes.FILE_UPLOAD: FileUploadRequestHandler(),
+    RequestTypes.VALID_CRC: ValidCRCRequestHandler(),
+    RequestTypes.INVALID_CRC: InvalidCRCRequestHandler(),
+    RequestTypes.INVALID_CRC_ABORT: InvalidCRCAbortRequestHandler()
 }
 
 
