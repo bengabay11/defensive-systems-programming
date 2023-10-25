@@ -1,17 +1,13 @@
 from logging import error, info, warning
 import logging
 import os
+import threading
+from time import sleep
 
 from server import Server
 import config
 from dal.db_connection import DBConnection
 from dal.server_db import ServerDB
-
-
-MAX_CLIENTS = 5
-DEFAULT_PORT = 1357
-PORT_FILE_PATH = os.path.join(os.path.dirname(__file__), 'port.info')
-CHAT_SERVER_HOST = os.environ.get('HOST', '0.0.0.0')
 
 
 def load_port(port_file_path: str):
@@ -20,8 +16,8 @@ def load_port(port_file_path: str):
             return int(port_file.read())
     else:
         warning(
-            f"Port file not found: {port_file_path}. Using default port: {DEFAULT_PORT}")
-        return DEFAULT_PORT
+            f"Port file not found: {port_file_path}. Using default port: {config.DEFAULT_PORT}")
+        return config.DEFAULT_PORT
 
 
 def main():
@@ -34,14 +30,14 @@ def main():
     info(f"Connecting to database at {config.DB_PATH}")
     db_connection.connect(config.DB_PROTOCOL, config.DB_PATH)
     server_db = ServerDB(db_connection)
-    info(f'Loading port from {PORT_FILE_PATH}')
-    server_port = load_port(PORT_FILE_PATH)
+    info(f'Loading port from {config.PORT_FILE_PATH}')
+    server_port = load_port(config.PORT_FILE_PATH)
     try:
-        info(f'Starting server on {CHAT_SERVER_HOST}:{server_port}...')
-        chat_server = Server(CHAT_SERVER_HOST, server_port, server_db)
-        chat_server.run(MAX_CLIENTS)
+        server = Server(config.SERVER_HOST, server_port, server_db)
+        server.run(config.MAX_CLIENTS)
     except Exception as exception:
-        error(f"Aborting server due to an error: {exception}")
+        error(f"Aborting server due to an exception: {exception}")
+        server.close()
         exit(1)
 
 

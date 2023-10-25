@@ -2,44 +2,53 @@ from logging import error, info
 import os
 from socket import AF_INET, SOCK_STREAM, SOL_SOCKET, socket, SO_REUSEADDR
 from threading import Thread
+import threading
 
-import protocol
 from request_router import handle_request
 from dal.server_db import ServerDB
 import config
+from client_handler import ClientHandler
 
 
 class Server(object):
-    def __init__(self, host: str, port: int, server_db: ServerDB):
+    def __init__(self, host: str, port: int, server_db: ServerDB, server_socket_timeout: int = config.DEFAULT_SERVER_SOCKET_TIMEOUT):
         self.host = host
         self.port = port
         self.server_db = server_db
-        self.socket = socket(AF_INET, SOCK_STREAM)
-        self.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-        self.socket.bind((self.host, self.port))
+        self.server_socket = socket(AF_INET, SOCK_STREAM)
+        self.server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        if server_socket_timeout:
+            self.server_socket.settimeout(server_socket_timeout)
+        self.server_socket.bind((self.host, self.port))
+        self.should_run = True
+        self.client_handlers = []
+        self.client_thread_lock = threading.Lock()
 
     def run(self, max_clients):
+        info(f'Starting server on {self.host}:{self.port}...')
         if not os.path.isdir(config.UPLOADED_FILES_DIRECTORY):
             info(f"Uploaded files directory not exist. Creating it - '{config.UPLOADED_FILES_DIRECTORY}'")
             os.mkdir(config.UPLOADED_FILES_DIRECTORY)
-        self.socket.listen(max_clients)
-        while True:
-            client_socket, address = self.socket.accept()
-            info(f'Accepted new connection: {address}')
-            Thread(target=self.handle_client, args=(client_socket, self.server_db)).start()
-
-    def handle_client(self, client_socket: socket, server_db: ServerDB, socket_timeout=60):
-        client_socket.settimeout(socket_timeout)
-        receive_requests = True
-        while receive_requests:
+        self.server_socket.listen(max_clients)
+        while self.should_run:
             try:
-                request_header = protocol.get_request_header(client_socket)
-                info(f"Received request header from {request_header}")
-                response_code, payload = handle_request(client_socket, request_header, server_db)
-                info(f"Sending response to {client_socket}, Code={response_code}")
-                protocol.send_response(client_socket, response_code.value, payload)
-            except Exception as exception:
-                error(
-                    f'Closing client connection due to an error: {exception}')
-                client_socket.close()
-                receive_requests = False
+                client_socket, address = self.server_socket.accept()
+                info(f'Accepted new connection: {address}')
+                client_handler = ClientHandler(client_socket, self.server_db)
+                Thread(target=client_handler.run).start()
+                with self.client_thread_lock:
+                    self.client_handlers.append(client_handler)
+            except Exception as e:
+                error(f"Exception while accepting connection: {e}")
+
+    def close(self):
+        info("Closing server")
+        self.should_run = False
+        if self.server_socket:
+            info("Closing server socket")
+            self.server_socket.close()
+        with self.client_thread_lock:
+            info("Closing all client handlers")
+            for client_handler in self.client_handlers:
+                if client_handler.is_running():
+                    client_handler.close()
