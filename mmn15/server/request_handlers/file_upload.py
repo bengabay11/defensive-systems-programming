@@ -3,7 +3,6 @@ import os
 from socket import socket
 import struct
 from uuid import UUID
-import uuid
 
 from request_handlers.base import BaseRequestHandler
 from dal.server_db import ServerDB
@@ -29,7 +28,7 @@ class FileUploadRequestHandler(BaseRequestHandler):
         filename = filename_bytes.decode().rstrip("\x00")
         client_id = UUID(bytes=request_header.client_id)
         client = authenticate_client(client_id, server_db)
-        base_folder = os.path.join(config.UPLOADED_FILES_DIRECTORY, str(uuid.uuid4()))
+        base_folder = os.path.join(config.UPLOADED_FILES_DIRECTORY, str(client_id))
         file = server_db.files.get_file(client_id, filename)
         if not file:
             content_crc, decrypted_content = self.upload_file(
@@ -65,7 +64,9 @@ class FileUploadRequestHandler(BaseRequestHandler):
 
     def save_file(self, base_folder: str, file_content: bytes, client_id: UUID, filename: str, server_db: ServerDB):
         debug(f"Saving file '{filename}' to folder '{base_folder}'")
-        os.mkdir(base_folder)
+        if not os.path.exists(base_folder):
+            info(f"Base folder does not exist for client {client_id}. Creating it now.")
+            os.mkdir(base_folder)
         file_path = os.path.join(base_folder, filename)
         file = File(id=client_id, file_name=filename, path_name=file_path, verified=False)
         server_db.files.insert_file(file)
