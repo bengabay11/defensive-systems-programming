@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from sqlalchemy import String, Column, Boolean
 from sqlalchemy_utils import UUIDType
 

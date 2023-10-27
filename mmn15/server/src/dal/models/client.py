@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from sqlalchemy import String, Column, LargeBinary, DateTime
 from sqlalchemy_utils import UUIDType
 

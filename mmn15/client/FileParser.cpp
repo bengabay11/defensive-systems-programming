@@ -74,6 +74,7 @@ void FileParser::dumpLoginInfo(
 }
 
 void FileParser::dumpPrivateKey(const char outFilename[], std::string privateKey) {
+	std::cout << "Dumping private key to " << outFilename << std::endl;
 	std::fstream loginFile(outFilename, std::ios::out);
 	if (loginFile.is_open()) {
 		loginFile << privateKey;

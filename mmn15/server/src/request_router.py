@@ -1,8 +1,8 @@
-from logging import error
+import logging
 from socket import socket
 
 from errors import BaseServerError, UnsupportedRequestCodeException
-from protocol import RequestTypes, RequestHeader
+from protocol import RequestTypes, RequestHeader, Response
 from request_handlers.exchange_keys import ExchangeKeysRequestHandler
 from request_handlers.file_upload import FileUploadRequestHandler
 from request_handlers.invalid_crc import InvalidCRCRequestHandler
@@ -24,7 +24,7 @@ REQUEST_HANDLERS = {
 }
 
 
-def handle_request(client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> (ResponseCodes, any):
+def handle_request(client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response:
     request_type = RequestTypes(request_header.code)
     request_handler = REQUEST_HANDLERS.get(request_type)
     if not request_handler:
@@ -32,8 +32,8 @@ def handle_request(client_socket: socket, request_header: RequestHeader, server_
     try:
         return request_handler.handle(client_socket, request_header, server_db)
     except BaseServerError as exception:
-        error(f"Error while handling request. request code: {request_header.code}, error: {exception}");
-        return exception.error_code(), b''
+        logging.error(f"Error while handling request. request code: {request_header.code}, error: {exception}");
+        return Response(exception.error_code(), b'')
     except Exception as exception:
-        error(f"Unknown Error while handling request. request code: {request_header.code}, error: {exception}");
-        return ResponseCodes.GENERAL_SERVER_ERROR, b''
+        logging.error(f"Unknown Error while handling request. request code: {request_header.code}, error: {exception}");
+        return Response(ResponseCodes.GENERAL_SERVER_ERROR, b'')

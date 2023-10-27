@@ -4,18 +4,18 @@ import uuid
 
 from request_handlers.base import BaseRequestHandler
 from dal.server_db import ServerDB
-from protocol import ResponseCodes
+from protocol import Response, ResponseCodes
 from dal.models.client import Client
 from protocol import RequestHeader
 from errors import RegistrationFailError
 
 
 class RegisterRequestHandler(BaseRequestHandler):
-    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> (ResponseCodes, bytes):
+    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response:
         payload = client_socket.recv(request_header.payload_size)
         client_name = payload.decode().rstrip("\x00")
         client_id = self.register_client(client_name, server_db)
-        return ResponseCodes.REGISTRATION_SUCCESS, client_id.bytes
+        return Response(ResponseCodes.REGISTRATION_SUCCESS, client_id.bytes)
     
     def register_client(self, client_name: str, server_db: ServerDB):
         if server_db.clients.client_name_exists(client_name):

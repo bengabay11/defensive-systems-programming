@@ -278,35 +278,41 @@ bool Client::uploadFile(char clientId[Consts::CLIENT_ID_SIZE], std::string fileP
 void Client::sendCRCRequest(
 	Consts::RequestCodes requestCode,
 	char clientId[Consts::CLIENT_ID_SIZE],
-	char filename[Consts::FILE_NAME_SIZE]
+	char filename[Consts::FILE_NAME_SIZE],
+	bool waitForResponse
 )
 {
 	CRCRequest crcRequest{};
 	memcpy(crcRequest.filename, filename, Consts::FILE_NAME_SIZE);
 	char* crcRequestBuffer = reinterpret_cast<char*>(&crcRequest);
-	ResponseHeader responseHeader = this->requestResponseWorkflow(clientId, requestCode, crcRequestBuffer, sizeof(crcRequest));
-	if (responseHeader.code == Consts::ResponseCodes::MESSAGE_ACCEPTED) {
-		CRCResponse crcResponse {};
-		char* fileUploadResponseBuffer = reinterpret_cast<char*>(&crcResponse);
-		this->clientSocket->receive(fileUploadResponseBuffer, sizeof(crcResponse));
-		std::cout << "Received CRC Response" << std::endl;
+	if (waitForResponse) {
+		ResponseHeader responseHeader = this->requestResponseWorkflow(clientId, requestCode, crcRequestBuffer, sizeof(crcRequest));
+		if (responseHeader.code == Consts::ResponseCodes::MESSAGE_ACCEPTED) {
+			CRCResponse crcResponse{};
+			char* fileUploadResponseBuffer = reinterpret_cast<char*>(&crcResponse);
+			this->clientSocket->receive(fileUploadResponseBuffer, sizeof(crcResponse));
+			std::cout << "Received CRC Response" << std::endl;
+		}
+		else {
+			throw UnkownResponseCodeException(responseHeader.code);
+		}
 	}
 	else {
-		throw UnkownResponseCodeException(responseHeader.code);
+		this->sendRequest(clientId, requestCode, crcRequestBuffer, sizeof(crcRequest));
 	}
 }
 
 void Client::sendInvalidCRC(char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE])
 {
-	this->sendCRCRequest(Consts::RequestCodes::INVALID_CRC, clientId, filename);
+	this->sendCRCRequest(Consts::RequestCodes::INVALID_CRC, clientId, filename, false);
 }
 
 void Client::sendInvalidCRCAbort(char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE])
 {
-	this->sendCRCRequest(Consts::RequestCodes::INVALID_CRC_ABORT, clientId, filename);
+	this->sendCRCRequest(Consts::RequestCodes::INVALID_CRC_ABORT, clientId, filename, true);
 }
 
 void Client::sendValidCRC(char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE])
 {
-	this->sendCRCRequest(Consts::RequestCodes::VALID_CRC, clientId, filename);
+	this->sendCRCRequest(Consts::RequestCodes::VALID_CRC, clientId, filename, true);
 }

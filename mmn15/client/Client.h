@@ -44,7 +44,12 @@ private:
 	);
 	ExchangeKeysResponse receiveAESKey(char clientName[Consts::CLIENT_NAME_SIZE]);
 	std::string exchangeKeys(char clientId[Consts::CLIENT_ID_SIZE], char clientName[Consts::CLIENT_NAME_SIZE]);
-	void sendCRCRequest(Consts::RequestCodes requestCode, char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE]);
+	void sendCRCRequest(
+		Consts::RequestCodes requestCode,
+		char clientId[Consts::CLIENT_ID_SIZE],
+		char filename[Consts::FILE_NAME_SIZE],
+		bool waitForResponse
+	);
 	void sendInvalidCRC(char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE]);
 	void sendInvalidCRCAbort(char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE]);
 	void sendValidCRC(char clientId[Consts::CLIENT_ID_SIZE], char filename[Consts::FILE_NAME_SIZE]);

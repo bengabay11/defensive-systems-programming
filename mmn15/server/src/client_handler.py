@@ -1,4 +1,4 @@
-from logging import info, error
+import logging
 from socket import socket
 
 from dal.server_db import ServerDB
@@ -16,23 +16,24 @@ class ClientHandler(object):
         self.should_run = True
 
     def run(self):
-        info(f"Handling new client connection {self.client_socket}")
+        logging.info(f"Handling new client connection {self.client_socket}")
         while self.should_run:
             try:
                 request_header = protocol.get_request_header(self.client_socket)
-                info(f"Received request header from {request_header}")
-                response_code, payload = handle_request(self.client_socket, request_header, self.server_db)
-                info(f"Sending response to {self.client_socket}, Code={response_code}")
-                protocol.send_response(self.client_socket, response_code.value, payload)
+                logging.info(f"Received request header from {request_header}")
+                response = handle_request(self.client_socket, request_header, self.server_db)
+                if response:
+                    logging.info(f"Sending response to {self.client_socket}, Code={response.code}")
+                    protocol.send_response(self.client_socket, response)
             except Exception as exception:
-                error(f'Exception while received request from client: {exception}')
+                logging.error(f'Exception while received request from client: {exception}')
                 self.close()
 
     def is_running(self):
         return self.should_run
 
     def close(self):
-        info(f"Closing client connection with {self.client_socket}")
+        logging.info(f"Closing client connection with {self.client_socket}")
         self.should_run = False
         if self.client_socket:
             self.client_socket.close()

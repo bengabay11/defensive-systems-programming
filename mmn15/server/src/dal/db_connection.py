@@ -1,5 +1,5 @@
 from functools import wraps
-from logging import info
+import logging
 from typing import Type, Any
 
 from sqlalchemy import create_engine
@@ -36,7 +36,7 @@ class DBConnection(object):
         url = f"{protocol}:///{database}"
         engine = create_engine(url)
         if not database_exists(engine.url):
-            info(f"Database not exist at - '{url}'. Creating a new one")
+            logging.info(f"Database not exist at - '{url}'. Creating a new one")
             create_database(url)
             Base.metadata.create_all(engine)
         self.session_maker = sessionmaker(bind=engine)

@@ -6,6 +6,10 @@ from enum import Enum
 
 import config
 
+REQUEST_HEADER_FORMAT = "<16sBHL"
+RESPONSE_HEADER_FORMAT = "<BHL"
+
+
 class RequestTypes(Enum):
     REGISTER = 1025
     EXCHANGE_KEYS = 1026
@@ -26,8 +30,11 @@ class ResponseCodes(Enum):
     LOGIN_FAIL = 2106
     GENERAL_SERVER_ERROR = 2107
 
-REQUEST_HEADER_FORMAT = "<16sBHL"
-RESPONSE_HEADER_FORMAT = "<BHL"
+
+class EmptyRequestHeaderException(Exception):
+    def __init__(self) -> None:
+        message = f"Received empty request header."
+        super().__init__(message)
 
 
 @dataclass
@@ -38,10 +45,10 @@ class RequestHeader(object):
     payload_size: int
 
 
-class EmptyRequestHeaderException(Exception):
-    def __init__(self) -> None:
-        message = f"Received empty request header."
-        super().__init__(message)
+@dataclass
+class Response(object):
+    code: ResponseCodes
+    payload: bytes
 
 
 def get_request_header(client_socket: socket) -> RequestHeader:
@@ -54,6 +61,6 @@ def get_request_header(client_socket: socket) -> RequestHeader:
         raise EmptyRequestHeaderException()
 
 
-def send_response(client_socket: socket, code: ResponseCodes, payload: bytes) -> bytes:
-    packed_response_header = struct.pack(RESPONSE_HEADER_FORMAT, config.VERSION, int(code), len(payload))
-    client_socket.send(packed_response_header + payload)
+def send_response(client_socket: socket, response: Response) -> bytes:
+    packed_response_header = struct.pack(RESPONSE_HEADER_FORMAT, config.VERSION, int(response.code.value), len(response.payload))
+    client_socket.send(packed_response_header + response.payload)
