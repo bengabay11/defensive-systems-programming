@@ -4,7 +4,6 @@ from socket import AF_INET, SOCK_STREAM, SOL_SOCKET, socket, SO_REUSEADDR
 from threading import Thread
 import threading
 
-from request_router import handle_request
 from dal.server_db import ServerDB
 import config
 from client_handler import ClientHandler

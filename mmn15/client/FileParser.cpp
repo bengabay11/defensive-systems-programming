@@ -1,10 +1,10 @@
 #include "FileParser.h"
 
-TransferFileContent FileParser::parseTransferFile()
+TransferFileContent FileParser::parseTransferFile(const char filename[])
 {
-	std::cout << "Parsing trasfer file "<< Consts::TRANSFER_DETAILS_FILENAME << std::endl;
+	std::cout << "Parsing trasfer file "<< filename << std::endl;
 	std::ifstream transferFile;
-	transferFile.open(Consts::TRANSFER_DETAILS_FILENAME);
+	transferFile.open(filename);
 	if (transferFile.is_open()) {
 		TransferFileContent transferFileContent;
 		std::string address, clientName;
@@ -20,15 +20,15 @@ TransferFileContent FileParser::parseTransferFile()
 		return transferFileContent;
 	}
 	else {
-		throw OpenFileException(Consts::TRANSFER_DETAILS_FILENAME);
+		throw OpenFileException(filename);
 	}
 }
 
-ClientLoginData FileParser::parseLoginFile()
+ClientLoginData FileParser::parseLoginFile(const char filename[])
 {
-	std::cout << "Parsing login file " << Consts::LOGIN_DETAILS_FILENAME << std::endl;
+	std::cout << "Parsing login file " << filename << std::endl;
 	std::fstream meFile;
-	meFile.open(Consts::LOGIN_DETAILS_FILENAME);
+	meFile.open(filename);
 	if (meFile.is_open()) {
 		ClientLoginData clientLoginData{};
 		std::string clientName, encodedClientId, encodedPrivateRSAKey;
@@ -42,16 +42,17 @@ ClientLoginData FileParser::parseLoginFile()
 		return clientLoginData;
 	}
 	else {
-		throw OpenFileException(Consts::LOGIN_DETAILS_FILENAME);
+		throw OpenFileException(filename);
 	}
 }
 
 void FileParser::dumpLoginInfo(
 	char clientId[Consts::CLIENT_ID_SIZE],
 	char clientName[Consts::CLIENT_NAME_SIZE],
-	std::string rsaPrivateKey
+	std::string rsaPrivateKey,
+	const char outFilename[]
 ) {
-	std::cout << "Dumping login info to " << Consts::LOGIN_DETAILS_FILENAME << std::endl;
+	std::cout << "Dumping login info to " << outFilename << std::endl;
 	std::string hex;
 	this->stream2hex(clientId, Consts::CLIENT_ID_SIZE, hex, true);
 	std::string encodedPrivateKey = Base64Wrapper::encode(rsaPrivateKey);
@@ -60,7 +61,7 @@ void FileParser::dumpLoginInfo(
 		encodedPrivateKey.replace(pos, 1, "");
 	}
 
-	std::fstream loginFile(Consts::LOGIN_DETAILS_FILENAME, std::ios::out);
+	std::fstream loginFile(outFilename, std::ios::out);
 	if (loginFile.is_open()) {
 		loginFile << clientName << std::endl;
 		loginFile << std::string(hex) << std::endl;
@@ -68,7 +69,18 @@ void FileParser::dumpLoginInfo(
 		loginFile.close();
 	}
 	else {
-		throw OpenFileException(Consts::LOGIN_DETAILS_FILENAME);
+		throw OpenFileException(outFilename);
+	}
+}
+
+void FileParser::dumpPrivateKey(const char outFilename[], std::string privateKey) {
+	std::fstream loginFile(outFilename, std::ios::out);
+	if (loginFile.is_open()) {
+		loginFile << privateKey;
+		loginFile.close();
+	}
+	else {
+		throw OpenFileException(outFilename);
 	}
 }
 

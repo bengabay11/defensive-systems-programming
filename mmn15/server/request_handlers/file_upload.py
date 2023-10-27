@@ -20,6 +20,7 @@ from dal.models.client import Client
 METADATA_FORMAT = "<L255s"
 FILE_CHUNK_SIZE = 1024
 
+
 class FileUploadRequestHandler(BaseRequestHandler):
     def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> (ResponseCodes, bytes):
         metadata_buffer_size = struct.calcsize(METADATA_FORMAT)

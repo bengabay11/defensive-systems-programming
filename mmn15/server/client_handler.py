@@ -25,8 +25,7 @@ class ClientHandler(object):
                 info(f"Sending response to {self.client_socket}, Code={response_code}")
                 protocol.send_response(self.client_socket, response_code.value, payload)
             except Exception as exception:
-                error(
-                    f'Exception while received request from client: {exception}')
+                error(f'Exception while received request from client: {exception}')
                 self.close()
 
     def is_running(self):

@@ -3,7 +3,7 @@ import os
 
 
 VERSION = 3
-UPLOADED_FILES_DIRECTORY = os.path.join(os.getcwd(), "server", "files")
+UPLOADED_FILES_DIRECTORY = os.path.join(os.getcwd(), "files")
 
 # Logging
 LOGGING_LEVEL = logging.DEBUG

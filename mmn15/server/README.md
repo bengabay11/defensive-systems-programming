@@ -2,9 +2,43 @@
 
 This README provides detailed information about the server software in the client-server file transfer system. The server is written in Python and is responsible for managing user registrations, exchanging encryption keys, and securely receiving and storing files from clients.
 
-## Installation
+## Installation and Setup
 
-- Install Python 3.11.4 and the required packages, including `Cipher.Crypto` for encryption.
+Before running the server software, make sure you have installed the necessary dependencies and set up the required configuration files. We recommend using Poetry for managing project dependencies.
+
+### Installation
+
+1. Install Poetry if you haven't already by following the instructions on the official website: [Poetry Installation Guide](https://python-poetry.org/docs/#installation).
+
+2. Clone or download the server code from the project repository.
+
+3. Open a terminal and navigate to the server directory.
+
+4. Run the following command to create a virtual environment and install project dependencies:
+
+   ```bash
+   $ poetry install
+   ```
+
+### Setup
+
+Create a file named `port.info` in the same folder as the server's code files. This file should contain the port number for server communication.
+
+Example:
+
+```bash
+1234
+```
+
+## Running the server
+
+To run the server software, execute the following command within the server directory:
+
+```bash
+poetry run python main.py
+```
+
+The server will read the port number from `port.info`, load the database, and start listening for requests from clients.
 
 ## Data Storage
 

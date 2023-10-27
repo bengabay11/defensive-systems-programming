@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "mmn15-server"
+version = "0.1.0"
+description = ""
+authors = ["Ben Gabay <ben.gabay38@gmail.com>"]
+readme = "README.md"
+packages = [{include = "mmn15_server"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pattern-singleton = "^1.2.0"
+sqlalchemy = "^2.0.22"
+sqlalchemy-utils = "^0.41.1"
+pycryptodome = "^3.19.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

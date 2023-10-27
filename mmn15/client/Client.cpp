@@ -16,7 +16,7 @@ ClientHolder Client::connect(std::string host, int port, char clientName[Consts:
 	std::ifstream loginFile;
 	loginFile.open(Consts::LOGIN_DETAILS_FILENAME);
 	if (loginFile.is_open()) {
-		ClientLoginData clientLoginData = this->fileParser.parseLoginFile();
+		ClientLoginData clientLoginData = this->fileParser.parseLoginFile(Consts::LOGIN_DETAILS_FILENAME);
 		LoginResponse loginResponse = this->login(clientLoginData.clientId, clientLoginData.clientName);
 		this->rsaPrivateWrapper.setPrivateKey(clientLoginData.privateRSAKey);
 		std::string aesKey = this->rsaPrivateWrapper.decrypt(loginResponse.encryptedAESKey, Consts::ENCRYPTED_AES_KEY_SIZE);
@@ -179,7 +179,9 @@ std::string Client::exchangeKeys(char clientId[Consts::CLIENT_ID_SIZE], char cli
 
 	ResponseHeader responseHeader = this->sendPublicKey(clientId, clientName, publicKeyBuffer);
 	ExchangeKeysResponse exchangeKeysResponse = this->receiveAESKey(clientName);
-	this->fileParser.dumpLoginInfo(clientId, clientName, this->rsaPrivateWrapper.getPrivateKey());
+	std::string privateKey = this->rsaPrivateWrapper.getPrivateKey();
+	this->fileParser.dumpLoginInfo(clientId, clientName, privateKey, Consts::LOGIN_DETAILS_FILENAME);
+	this->fileParser.dumpPrivateKey(Consts::PRIVATE_KEY_FILENAME, privateKey);
 	return this->rsaPrivateWrapper.decrypt(exchangeKeysResponse.aesKey, Consts::ENCRYPTED_AES_KEY_SIZE);
 }
 
