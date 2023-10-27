@@ -1,3 +1,4 @@
 server/files
 server/defensive.db
+client/priv.key
 client/me.info

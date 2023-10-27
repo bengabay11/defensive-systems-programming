@@ -43,7 +43,7 @@ namespace Consts
 
 	constexpr char TRANSFER_DETAILS_FILENAME[] = "transfer.info";
 	constexpr char LOGIN_DETAILS_FILENAME[] = "me.info";
-	constexpr char PRIVATE_KEY_FILENAME[] = "me.info";
+	constexpr char PRIVATE_KEY_FILENAME[] = "priv.key";
 
 	const size_t BUFFER_SIZE = 2048;
 }

@@ -8,9 +8,9 @@
 			"name": "Run server",
 			"type": "python",
 			"request": "launch",
-			"program": "${workspaceFolder}/server/main.py",
+			"program": "${workspaceFolder}/src/main.py",
 			"console": "integratedTerminal",
-			"cwd": "${workspaceFolder}/server",
+			"cwd": "${workspaceFolder}",
 			"justMyCode": true
 		}
 	]

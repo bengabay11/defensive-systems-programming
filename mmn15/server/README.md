@@ -35,8 +35,9 @@ Example:
 To run the server software, execute the following command within the server directory:
 
 ```bash
-poetry run python main.py
+$ python src/main.py
 ```
+Or you can simply use [vscode launch configuration](./.vscode/launch.json).
 
 The server will read the port number from `port.info`, load the database, and start listening for requests from clients.
 
