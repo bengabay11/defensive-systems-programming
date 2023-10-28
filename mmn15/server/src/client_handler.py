@@ -15,7 +15,7 @@ class ClientHandler(object):
             client_socket.settimeout(socket_timeout)
         self.should_run = True
 
-    def run(self):
+    def run(self) -> None:
         logging.info(f"Handling new client connection {self.client_socket}")
         while self.should_run:
             try:
@@ -29,10 +29,10 @@ class ClientHandler(object):
                 logging.error(f'Exception while received request from client: {exception}')
                 self.close()
 
-    def is_running(self):
+    def is_running(self) -> bool:
         return self.should_run
 
-    def close(self):
+    def close(self) -> None:
         logging.info(f"Closing client connection with {self.client_socket}")
         self.should_run = False
         if self.client_socket:

@@ -22,7 +22,7 @@ FILE_CHUNK_SIZE = 1024
 
 
 class FileUploadRequestHandler(BaseRequestHandler):
-    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response:
+    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response|None:
         metadata_buffer_size = struct.calcsize(METADATA_FORMAT)
         payload_metadata = client_socket.recv(metadata_buffer_size)
         content_size, filename_bytes = struct.unpack(METADATA_FORMAT, payload_metadata)
@@ -44,7 +44,7 @@ class FileUploadRequestHandler(BaseRequestHandler):
         payload = struct.pack(RESPONSE_FORMAT, client_id.bytes, len(decrypted_content), filename.encode(), content_crc)
         return Response(ResponseCodes.VALID_FILE_ACCEPTED, payload)
 
-    def receive_file_content(self, client_socket: socket, content_size: int):
+    def receive_file_content(self, client_socket: socket, content_size: int) -> bytes:
         encrypted_content = b""
         remaining_bytes = content_size
         while remaining_bytes > 0:
@@ -53,7 +53,15 @@ class FileUploadRequestHandler(BaseRequestHandler):
             remaining_bytes -= len(block)
         return encrypted_content
 
-    def upload_file(self, client_socket: socket, client: Client, base_folder: str, filename: str,content_size: int, server_db: ServerDB, override: bool):
+    def upload_file(
+            self,
+            client_socket: socket,
+            client: Client,
+            base_folder: str,
+            filename: str,
+            content_size: int,
+            server_db: ServerDB,
+            override: bool) ->(int, bytes):
         logging.info(f"Uploading file '{filename}' for client '{client.name}' to the server")
         encrypted_content = self.receive_file_content(client_socket, content_size)
         decrypted_content = cipher.decrypt_bytes(client.aes_key, encrypted_content)
@@ -62,7 +70,15 @@ class FileUploadRequestHandler(BaseRequestHandler):
         logging.info(f"CRC for file '{filename}' - {content_crc}")
         return content_crc, decrypted_content
 
-    def save_file(self, base_folder: str, file_content: bytes, client_id: UUID, filename: str, server_db: ServerDB, override: bool):
+    def save_file(
+            self,
+            base_folder: str,
+            file_content: bytes,
+            client_id: UUID,
+            filename: str,
+            server_db: ServerDB,
+            override: bool
+        ) -> None:
         logging.debug(f"Saving file '{filename}' to folder '{base_folder}'")
         if not os.path.exists(base_folder):
             logging.info(f"Base folder does not exist for client {client_id}. Creating it now.")

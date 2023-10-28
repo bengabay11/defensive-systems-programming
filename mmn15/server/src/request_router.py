@@ -24,7 +24,7 @@ REQUEST_HANDLERS = {
 }
 
 
-def handle_request(client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response:
+def handle_request(client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response|None:
     request_type = RequestTypes(request_header.code)
     request_handler = REQUEST_HANDLERS.get(request_type)
     if not request_handler:

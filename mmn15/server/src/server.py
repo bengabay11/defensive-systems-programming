@@ -23,7 +23,7 @@ class Server(object):
         self.client_handlers = []
         self.client_thread_lock = threading.Lock()
 
-    def run(self, max_clients):
+    def run(self, max_clients: int) -> None:
         logging.info(f'Starting server on {self.host}:{self.port}...')
         if not os.path.isdir(config.UPLOADED_FILES_DIRECTORY):
             logging.info(f"Uploaded files directory not exist. Creating it - '{config.UPLOADED_FILES_DIRECTORY}'")
@@ -40,7 +40,7 @@ class Server(object):
             except Exception as e:
                 logging.error(f"Exception while accepting connection: {e}")
 
-    def close(self):
+    def close(self) -> None:
         logging.info(f"Closing server")
         self.should_run = False
         if self.server_socket:

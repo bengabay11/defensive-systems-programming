@@ -1,7 +1,5 @@
-from typing import List
 from uuid import UUID
 from dal.db_connection import DBConnection
-from dal.models.client import Client
 from dal.models.file import File
 
 

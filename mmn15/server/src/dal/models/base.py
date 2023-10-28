@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
 

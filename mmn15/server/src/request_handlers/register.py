@@ -11,13 +11,13 @@ from errors import RegistrationFailError
 
 
 class RegisterRequestHandler(BaseRequestHandler):
-    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response:
+    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response|None:
         payload = client_socket.recv(request_header.payload_size)
         client_name = payload.decode().rstrip("\x00")
         client_id = self.register_client(client_name, server_db)
         return Response(ResponseCodes.REGISTRATION_SUCCESS, client_id.bytes)
     
-    def register_client(self, client_name: str, server_db: ServerDB):
+    def register_client(self, client_name: str, server_db: ServerDB) -> uuid.UUID:
         if server_db.clients.client_name_exists(client_name):
             raise RegistrationFailError(client_name)
         else:

@@ -10,7 +10,7 @@ from request_handlers.common import authenticate_client
 
 
 class LoginRequestHandler(BaseRequestHandler):
-    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response:
+    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response|None:
         payload = client_socket.recv(request_header.payload_size)
         client_name = payload.decode().rstrip("\x00")
         client_id = uuid.UUID(bytes=request_header.client_id)

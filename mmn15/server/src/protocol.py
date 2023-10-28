@@ -61,6 +61,6 @@ def get_request_header(client_socket: socket) -> RequestHeader:
         raise EmptyRequestHeaderException()
 
 
-def send_response(client_socket: socket, response: Response) -> bytes:
+def send_response(client_socket: socket, response: Response) -> None:
     packed_response_header = struct.pack(RESPONSE_HEADER_FORMAT, config.VERSION, int(response.code.value), len(response.payload))
     client_socket.send(packed_response_header + response.payload)

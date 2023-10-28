@@ -7,7 +7,7 @@ from dal.db_connection import DBConnection
 from dal.server_db import ServerDB
 
 
-def load_port(port_file_path: str):
+def load_port(port_file_path: str) -> int:
     if os.path.exists(port_file_path):
         with open(port_file_path, 'r') as port_file:
             return int(port_file.read())

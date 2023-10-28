@@ -14,7 +14,7 @@ METADATA_FORMAT = "<255s160s"
 
 
 class ExchangeKeysRequestHandler(BaseRequestHandler):
-    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response:
+    def handle(self, client_socket: socket, request_header: RequestHeader, server_db: ServerDB) -> Response|None:
         payload = client_socket.recv(request_header.payload_size)
         client_name_bytes, public_key = struct.unpack(METADATA_FORMAT, payload)
         client_name = client_name_bytes.decode().rstrip("\x00")
@@ -23,7 +23,7 @@ class ExchangeKeysRequestHandler(BaseRequestHandler):
         payload = client_id.bytes + encrypted_aes_key
         return Response(ResponseCodes.PUBLIC_KEY_ACCEPTED, payload)
     
-    def exchange_keys(self, client_id: uuid.UUID, client_name: str, public_key: str, server_db: ServerDB):
+    def exchange_keys(self, client_id: uuid.UUID, client_name: str, public_key: str, server_db: ServerDB) -> bytes:
         client = authenticate_client(client_id, server_db)
         if client.name != client_name:
             raise UnauthorizedClientError(client_name, client.name)
